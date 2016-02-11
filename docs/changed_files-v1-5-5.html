@@ -2,7 +2,7 @@
 <!--
 /**
  * @package documentation
- * @copyright Copyright 2003-2015 Zen Cart Development Team
+ * @copyright Copyright 2003-2016 Zen Cart Development Team
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version GIT: $Id: Author: DrByte  Dec 30 2015  New in v1.5.5 $
  */
@@ -84,13 +84,13 @@ OSI Certified is a certification mark of the Open Source Initiative.</p>
 <h1>NEW Files ADDED to v1.5.5 (since release of v1.5.4)</h1>
 <ul>
 <li>admin/currency_cron.php</li>
-<li>admin/includes/auto_loaders/currency_cron.core.php</li>
-<li>admin/includes/defined_paths.php</li>
-<li>admin/includes/developers_tool_kit.css</li>
-<li>admin/includes/extra_configures/security_patch_v154_20151217.php</li>
-<li>admin/includes/extra_datafiles/sagepay_transaction_database_tables.php</li>
 <li>admin/index_dashboard.php</li>
 <li>admin/index_setup_wizard.php</li>
+<li>admin/includes/defined_paths.php</li>
+<li>admin/includes/developers_tool_kit.css</li>
+<li>admin/includes/auto_loaders/currency_cron.core.php</li>
+<li>admin/includes/classes/AdminRequestSanitizer.php</li>
+<li>admin/includes/extra_datafiles/sagepay_transaction_database_tables.php</li>
 <li>email/email_common.css</li>
 <li>extras/paypal_tlstest.php</li>
 <li>includes/auto_loaders/config.zca_layout.php</li>
@@ -104,8 +104,13 @@ OSI Certified is a certification mark of the Open Source Initiative.</p>
 <li>includes/init_includes/init_zca_layout.php</li>
 <li>includes/languages/english/extra_definitions/responsive_classic/product_free_shipping.php</li>
 <li>includes/languages/english/html_includes/responsive_classic/ (entire folder)</li>
+<li>includes/languages/english/modules/payment/firstdata_hco.php</li>
+<li>includes/languages/english/modules/payment/payeezyjszc.php</li>
 <li>includes/languages/english/modules/payment/sagepay_zc_form.php</li>
 <li>includes/languages/english/responsive_classic/  (entire folder)</li>
+<li>includes/modules/pages/checkout_payment/jscript_payeezyjs.php</li>
+<li>includes/modules/payment/firstdata_hco.php</li>
+<li>includes/modules/payment/payeezyjszc.php</li>
 <li>includes/modules/payment/sagepay_zc/AbstractSagepayAPI.php</li>
 <li>includes/modules/payment/sagepay_zc/SagepayBasket.php</li>
 <li>includes/modules/payment/sagepay_zc/SagepayCustomer.php</li>
@@ -122,16 +127,21 @@ OSI Certified is a certification mark of the Open Source Initiative.</p>
 </ul>
 <h1>DELETED Files in v1.5.5 (since release of v1.5.4)</h1>
 <ul>
+<li>admin/linkpoint_review.php</li>
 <li>admin/includes/classes/payment_module_info.php</li>
+<li>admin/includes/extra_datafiles/linkpoint_api_database_tables.php</li>
 <li>admin/includes/init_includes/init_currencies.php</li>
+<li>admin/includes/languages/english/linkpoint_review.php</li>
+<li>admin/includes/languages/english/extra_definitions/linkpoint_review.php</li>
 <li>email/email_template_tell_a_friend.html</li>
 <li>includes/classes/class.phpbb.php</li>
-<li>includes/classes/class.smtp.php</li>
+<li>includes/classes/class.smtp.php (this logic replaced with files in the vendors/phpMailer package)</li>
 <li>includes/classes/support/ (whole folder, replaced with vendors/phpMailer)</li>
-<li>includes/classes/vendors/password_compat-master/.travis.yml</li>
+<li>includes/classes/vendors/password_compat-master/.travis.yml (these auxilary files are not needed, but password_compat.php is retained)</li>
 <li>includes/classes/vendors/password_compat-master/README.md</li>
 <li>includes/classes/vendors/password_compat-master/phpunit.xml.dist</li>
 <li>includes/classes/vendors/password_compat-master/test/ (folder)</li>
+<li>includes/extra_datafiles/linkpoint_api_database_tables.php</li>
 <li>includes/languages/english/modules/payment/linkpoint_api.php</li>
 <li>includes/modules/payment/linkpoint_api.php</li>
 <li>includes/modules/payment/linkpoint_api/ (folder)</li>
@@ -476,7 +486,7 @@ OSI Certified is a certification mark of the Open Source Initiative.</p>
 
 <h1>&nbsp;</h1>
 </fieldset>
-<p class="center"><em>Copyright 2003 - 2015 Zen Ventures, LLC &mdash; Zen Cart&reg; www.zen-cart.com</em></p>
+<p class="center"><em>Copyright 2003 - 2016 Zen Ventures, LLC &mdash; Zen Cart&reg; www.zen-cart.com</em></p>
 <br><br>
 </body>
 </html>

@@ -73,7 +73,7 @@ class zcAjaxPayment extends base
 
     if (isset ($_POST['payment'])) $_SESSION['payment'] = $_POST['payment'];
 
-    $_SESSION['comments'] = $_POST['comments'];
+    $_SESSION['comments'] = zen_output_string_protected($_POST['comments']);
 
     if (DISPLAY_CONDITIONS_ON_CHECKOUT=='true') {
       if (!isset ($_POST['conditions'])||($_POST['conditions']!='1')) {

@@ -10,17 +10,12 @@ class zcObserverOptionNameTypeSelect extends base {
         $attachNotifier = array();
 
         $attachNotifier[] = 'NOTIFY_ATTRIBUTES_MODULE_START_OPTION';
-        $attachNotifier[] = 'NOTIFY_ATTRIBUTES_MODULE_DEFAULT_SWITCH';
 
         $this->attach($this, $attachNotifier);
     }
 
-    // This function is called to ensure that when the missing data is needed that it is available.
+    // This function is called to ensure that when the missing data is needed below that it is available.
     function updateNotifyAttributesModuleStartOption(&$callingClass, $notifier){
-        $this->updateNotifyAttributesModuleDefaultSwitch($callingClass, $notifier);
-    }
-
-    function updateNotifyAttributesModuleDefaultSwitch(&$callingClass, $notifier){
         global $db;
 
         if (!defined('PRODUCTS_OPTIONS_TYPE_SELECT')) {
@@ -35,5 +30,6 @@ class zcObserverOptionNameTypeSelect extends base {
             $db->Execute("INSERT INTO configuration (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES ('Text prefix', 'TEXT_PREFIX', 'txt_', 'Prefix used to differentiate between text option values and other option values', 6, NULL, now(), now(), NULL, NULL);");
             define('TEXT_PREFIX', 'txt_');
         }
+        // @unlink(__FILE__); // To delete this file after execution delete the first 2 characters of this line.
     }
 }

@@ -12,7 +12,7 @@
 ////
 //get specials price or sale price
   function zen_get_products_special_price($product_id, $specials_price_only=false) {
-    global $db;
+    global $db, $currencies;
     $product = $db->Execute("select products_price, products_model, products_priced_by_attribute from " . TABLE_PRODUCTS . " where products_id = '" . (int)$product_id . "'");
 
     if ($product->RecordCount() > 0) {
@@ -91,20 +91,20 @@
       }
 
       if (!$special_price) {
-        return number_format($sale_product_price, 4, '.', '');
+        return number_format($sale_product_price, $currencies->get_decimal_places($_SESSION['currency']), '.', '');
       } else {
         switch($sale->fields['sale_specials_condition']){
           case 0:
-            return number_format($sale_product_price, 4, '.', '');
+            return number_format($sale_product_price, $currencies->get_decimal_places($_SESSION['currency']), '.', '');
             break;
           case 1:
-            return number_format($special_price, 4, '.', '');
+            return number_format($special_price, $currencies->get_decimal_places($_SESSION['currency']), '.', '');
             break;
           case 2:
-            return number_format($sale_special_price, 4, '.', '');
+            return number_format($sale_special_price, $currencies->get_decimal_places($_SESSION['currency']), '.', '');
             break;
           default:
-            return number_format($special_price, 4, '.', '');
+            return number_format($special_price, $currencies->get_decimal_places($_SESSION['currency']), '.', '');
         }
       }
     }

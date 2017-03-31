@@ -536,6 +536,8 @@ class order extends base {
          *********************************************/
         $shown_price = (zen_add_tax($this->products[$index]['final_price'] * $this->products[$index]['qty'], $this->products[$index]['tax']))
         + zen_add_tax($this->products[$index]['onetime_charges'], $this->products[$index]['tax']);
+        $shown_price = round((zen_add_tax($this->products[$index]['final_price'], $this->products[$index]['tax'])), 2) * $this->products[$index]['qty']
+        + zen_add_tax($this->products[$index]['onetime_charges'], $this->products[$index]['tax']);
         $this->info['subtotal'] += $shown_price;
         $this->notify('NOTIFIY_ORDER_CART_SUBTOTAL_CALCULATE', array('shown_price'=>$shown_price));
         // find product's tax rate and description

@@ -147,7 +147,7 @@ for ($i=0, $n=sizeof($products); $i<$n; $i++) {
   $showMinUnits = zen_get_products_quantity_min_units_display($products[$i]['id']);
   $quantityField = zen_draw_input_field('cart_quantity[]', $products[$i]['quantity'], 'size="4" class="cart_input_'.$products[$i]['id'].'"');
   $ppe = $products[$i]['final_price'];
-  $ppe = zen_round(zen_add_tax($ppe, zen_get_tax_rate($products[$i]['tax_class_id'])), $currencies->get_decimal_places($_SESSION['currency']));
+  $ppe = /*zen_round*/(zen_add_tax($ppe, zen_get_tax_rate($products[$i]['tax_class_id']))/*, $currencies->get_decimal_places($_SESSION['currency'])*/);
   $ppt = $ppe * $products[$i]['quantity'];
   $productsPriceEach = $currencies->format($ppe) . ($products[$i]['onetime_charges'] != 0 ? '<br />' . $currencies->display_price($products[$i]['onetime_charges'], zen_get_tax_rate($products[$i]['tax_class_id']), 1) : '');
   $productsPriceTotal = $currencies->format($ppt) . ($products[$i]['onetime_charges'] != 0 ? '<br />' . $currencies->display_price($products[$i]['onetime_charges'], zen_get_tax_rate($products[$i]['tax_class_id']), 1) : '');

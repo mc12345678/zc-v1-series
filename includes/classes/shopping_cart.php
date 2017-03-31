@@ -897,7 +897,8 @@ class shoppingCart extends base {
             }
             ////////////////////////////////////////////////
           }
-          $attributesTotal += zen_round($productTotal, $decimalPlaces);
+          $attributesTotal += $productTotal;
+// mc12345678          $attributesTotal += zen_round($productTotal, $decimalPlaces);
         } // eof while
       } // attributes price
       $productTotal = $savedProductTotal + $attributesTotal;
@@ -949,11 +950,15 @@ class shoppingCart extends base {
 */
 //echo 'shopping_cart class Price: ' . $productTotal . ' qty: ' . $qty . '<br>';
 
-      $this->total += zen_round(zen_add_tax($productTotal, $products_tax), $decimalPlaces) * $qty;
-      $this->total += zen_round(zen_add_tax($totalOnetimeCharge, $products_tax), $decimalPlaces);
-      $this->free_shipping_price += zen_round(zen_add_tax($freeShippingTotal, $products_tax), $decimalPlaces) * $qty;
+      $this->total += zen_add_tax($productTotal, $products_tax) * $qty;
+      $this->total += zen_add_tax($totalOnetimeCharge, $products_tax);
+// mc12345678      $this->total += zen_round(zen_add_tax($productTotal, $products_tax), $decimalPlaces) * $qty;
+// mc12345678      $this->total += zen_round(zen_add_tax($totalOnetimeCharge, $products_tax), $decimalPlaces);
+      $this->free_shipping_price += zen_add_tax($freeShippingTotal, $products_tax) * $qty;
+// mc12345678      $this->free_shipping_price += zen_round(zen_add_tax($freeShippingTotal, $products_tax), $decimalPlaces) * $qty;
       if (($product->fields['product_is_always_free_shipping'] == 1) or ($product->fields['products_virtual'] == 1) or (preg_match('/^GIFT/', addslashes($product->fields['products_model'])))) {
-        $this->free_shipping_price += zen_round(zen_add_tax($totalOnetimeCharge, $products_tax), $decimalPlaces);
+        $this->free_shipping_price += zen_add_tax($totalOnetimeCharge, $products_tax);
+// mc12345678        $this->free_shipping_price += zen_round(zen_add_tax($totalOnetimeCharge, $products_tax), $decimalPlaces);
       }
 
 // ******* WARNING ADD ONE TIME ATTRIBUTES, PRICE FACTOR
@@ -1061,7 +1066,8 @@ class shoppingCart extends base {
         $_SESSION['cart_errors'] .= zen_get_products_name($attribute_price->fields['products_id'], $_SESSION['languages_id'])  . ERROR_PRODUCT_OPTION_SELECTION . '<br />';
         }
         */
-        $total_attributes_price += zen_round($attributes_price, $currencies->get_decimal_places($_SESSION['currency']));
+        $total_attributes_price += $attributes_price;
+// mc12345678        $total_attributes_price += zen_round($attributes_price, $currencies->get_decimal_places($_SESSION['currency']));
       }
     }
 
@@ -1390,10 +1396,12 @@ class shoppingCart extends base {
    * @return decimal Total Price
    */
   function show_total() {
+    global $currencies;
     $this->notify('NOTIFIER_CART_SHOW_TOTAL_START');
     $this->calculate();
     $this->notify('NOTIFIER_CART_SHOW_TOTAL_END');
-    return $this->total;
+//zen_round($attributes_price, $currencies->get_decimal_places($_SESSION['currency']))
+    return zen_round($this->total, $currencies->get_decimal_places($_SESSION['currency']));
   }
 
   /**
@@ -1402,10 +1410,11 @@ class shoppingCart extends base {
    * @return decimal Total Price before Specials, Sales, Discounts
    */
   function show_total_before_discounts() {
+    global $currencies;
     $this->notify('NOTIFIER_CART_SHOW_TOTAL_BEFORE_DISCOUNT_START');
     $this->calculate();
     $this->notify('NOTIFIER_CART_SHOW_TOTAL_BEFORE_DISCOUNT_END');
-    return $this->total_before_discounts;
+    return zen_round($this->total_before_discounts, $currencies->get_decimal_places($_SESSION['currency']));
   }
 
   /**
@@ -1698,8 +1707,9 @@ class shoppingCart extends base {
    * @return decimal
    */
   function free_shipping_items() {
+    global $currencies;
     $this->calculate();
-    return $this->free_shipping_item;
+    return zen_round($this->free_shipping_item, $currencies->get_decimal_places($_SESSION['currency'])); //mc12345678 Added rounding
   }
   /**
    * Method to return the total price of free shipping items in the cart
@@ -1707,9 +1717,10 @@ class shoppingCart extends base {
    * @return decimal
    */
   function free_shipping_prices() {
+	  global $currencies;
     $this->calculate();
 
-    return $this->free_shipping_price;
+    return zen_round($this->free_shipping_price, $currencies->get_decimal_places($_SESSION['currency'])); //mc12345678 Added rounding
   }
   /**
    * Method to return the total weight of free shipping items in the cart

@@ -37,7 +37,7 @@
 
         // special handling for currencies which don't support decimal places
         if ($decimal_point == '0' || in_array($code, array('JPY', 'HUF', 'TWD'))) {
-          $value = (int)$value;
+//          $value = (int)$value; // This doesn't make sense to do as nothing like it is done for any other currency and causes missing out on conversion when the "source" currency is low compared to this one.
           $decimal_places = 0;
         }
 
@@ -91,7 +91,7 @@
         zen_redirect(zen_href_link(FILENAME_CURRENCIES, 'page=' . $_GET['page']));
         break;
       case 'update_currencies':
-        zen_update_currencies();
+        zen_update_currencies(FALSE, FALSE);
         zen_redirect(zen_href_link(FILENAME_CURRENCIES, 'page=' . $_GET['page'] . '&cID=' . $_GET['cID']));
         break;
       case 'delete':

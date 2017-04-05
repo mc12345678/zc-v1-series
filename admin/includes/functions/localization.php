@@ -14,7 +14,7 @@
  * NOTE: admin application_top cannot be loaded successfully without an admin login ID.
  */
 
-function zen_update_currencies($cli_Output = FALSE)
+function zen_update_currencies($cli_Output = FALSE, $zero = TRUE)
 {
   global $db, $messageStack;
   zen_set_time_limit(600);
@@ -44,8 +44,8 @@ function zen_update_currencies($cli_Output = FALSE)
       }
 
       // special handling for currencies which don't support decimal places
-      if ($currency->fields['decimal_places'] == '0') {
-        $rate = (int)$rate;
+      if ($currency->fields['decimal_places'] == '0' && $zero) {
+        $rate = (int)$rate;  // This doesn't make sense for a currency.  No other currency is truncated like this, why this one?  Can cause loss of money for original values of 10 or greater.
       }
 
       if (zen_not_null($rate) && $rate > 0) {

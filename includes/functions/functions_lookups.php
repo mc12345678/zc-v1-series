@@ -285,9 +285,10 @@
  */
   function zen_has_product_attributes_values($products_id) {
     global $db;
-    $attributes_query = "select distinct count(options_values_price) as total, options_values_price as price
+    $attributes_query = "select distinct count(*) as total, options_values_price as price
                          from " . TABLE_PRODUCTS_ATTRIBUTES . "
-                         where products_id = " . (int)$products_id;
+                         where products_id = " . (int)$products_id . "
+                         group by options_values_price";
 
     $attributes = $db->Execute($attributes_query);
 

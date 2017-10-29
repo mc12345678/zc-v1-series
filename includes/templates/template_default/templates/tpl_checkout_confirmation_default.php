@@ -164,7 +164,7 @@
 ?>
 
 <?php
-  echo zen_draw_form('checkout_confirmation', $form_action_url, 'post', 'id="checkout_confirmation" onsubmit="submitonce();"');
+  echo zen_draw_form('checkout_confirmation', $form_action_url, 'post', 'id="checkout_confirmation" onsubmit="submitonce();"' . (is_array($payment_modules->modules) ? $payment_modules->process_form_params() : ''));
 
   if (is_array($payment_modules->modules)) {
     echo $payment_modules->process_button();

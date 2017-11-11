@@ -573,11 +573,22 @@ class AdminRequestSanitizer extends base
             } else if ($this->doStrictSanitization) {
                 unset($requestPost[$parameterName][$key]);
                 unset($_POST);
-                $_POST[$parameterName] = $key;
+                $_POST[$key] = $key;
                 // $this->arrayName = $currentArrayName; // Unnecessary as already set above.
                 $this->filterStrictSanitizeKeys();
-                if (array_key_exists($pkey, $_POST)) {
+                if (array_key_exists($key, $_POST)) {
+                    $this->arrayName = $currentArrayName;
+                    $currentPostKeysAlreadySanitized = $this->postKeysAlreadySanitized;
                     $this->filterStrictSanitizeValues();
+                    unset($this->postKeysAlreadySanitized);
+                    $this->postKeysAlreadySanitized = $currentPostKeysAlreadySanitized;
+                    unset($currentPostKeysAlreadySanitized);
+                    $this->postKeysAlreadySanitized[] = $this->setCurrentArrayName($key);
+                    $temp_val = $_POST[$key];
+                    unset($_POST[$key]);
+                    $_POST[$parameterName] = $temp_val;
+                    unset($temp_val);
+                    $key = $_POST[$key];
 //                    $newKey = $_POST[$parameterName]; // Moved to below to reduce redundancy
                     //$this->arrayName = $currentArrayName; // Don't need here because set below
 //                    $requestPost[$parameterName][$newKey] = $hacked; // Moved to below to reduce redundancy
@@ -617,7 +628,7 @@ class AdminRequestSanitizer extends base
                 }
             }
         }
-        $this->arrayName = $CurrentArrayName; // This is the base of the recent sanitization and what was sanitized
+        $this->arrayName = $currentArrayName; // This is the base of the recent sanitization and what was sanitized
         $_POST = $requestPost;
     }
 
@@ -651,6 +662,25 @@ class AdminRequestSanitizer extends base
                 $this->runSpecificSanitizer($pkey, $newParameterDefinition);
                 $this->arrayName = $currentArrayName; // Restore the internal pointer back to the base array.
                 $requestPost[$parameterName][$pkey] = $_POST[$pkey];
+            } else if ($this->doStrictSanitization) {
+                unset($requestPost[$parameterName][$pkey]);
+                unset($_POST);
+                $_POST[$pkey] = $pkey;
+                $this->filterStrictSanitizeKeys();
+                if (array_key_exists(/*$parameterName*/ $pkey, $_POST)) {
+                    $this->arrayName = $currentArrayName;
+                    $currentPostKeysAlreadySanitized = $this->postKeysAlreadySanitized;
+                    $this->filterStrictSanitizeValues();
+                    unset($this->postKeysAlreadySanitized);
+                    $this->postKeysAlreadySanitized = $currentPostKeysAlreadySanitized;
+                    unset($currentPostKeysAlreadySanitized);
+                    $this->postKeysAlreadySanitized[] = $this->setCurrentArrayName($pkey);
+                    $tempkey = $pkey;
+                    $pkey = $_POST[$pkey];
+                    unset($_POST[$tempkey]);
+                    $_POST[$pkey] = $pkey;
+                    $requestPost[$parameterName][$pkey] = $pvalue;
+                }
             }
             if ($this->doStrictSanitization) {
                 unset($_POST);
@@ -658,8 +688,14 @@ class AdminRequestSanitizer extends base
                 unset($requestPost[$parameterName][$pkey]);
                 $this->filterStrictSanitizeKeys();
                 if (array_key_exists($pkey, $_POST)) {
+                    $this->arrayName = $currentArrayName;
+                    $currentPostKeysAlreadySanitized = $this->postKeysAlreadySanitized;
                     $this->filterStrictSanitizeValues();
 //                    $this->arrayName = $currentArrayName; // Unnecessary as set below or in next loop.
+                    unset($this->postKeysAlreadySanitized);
+                    $this->postKeysAlreadySanitized = $currentPostKeysAlreadySanitized;
+                    unset($currentPostKeysAlreadySanitized);
+                    $this->postKeysAlreadySanitized[] = $this->setCurrentArrayName($pkey);
                     $requestPost[$parameterName][$pkey] = $_POST[$pkey];
                 }
             }
@@ -727,6 +763,7 @@ class AdminRequestSanitizer extends base
                             if ($type == 'post') {
                                 if (!in_array($this->arrayName, $ignore)) {
                                     $this->postKeysAlreadySanitized[] = $this->arrayName;
+                                    $this->arrayName = $currentArrayName;
                                 }
                             }
                         }

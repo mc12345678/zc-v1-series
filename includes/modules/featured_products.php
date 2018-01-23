@@ -13,12 +13,12 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 
 // initialize vars
-$categories_products_id_list = '';
+$categories_products_id_list = array();
 $list_of_products = '';
 $featured_products_query = '';
 $display_limit = '';
 
-if ( (($manufacturers_id > 0 && $_GET['filter_id'] == 0) || $_GET['music_genre_id'] > 0 || $_GET['record_company_id'] > 0) || (!isset($new_products_category_id) || $new_products_category_id == '0') ) {
+if ( (($manufacturers_id > 0 && $_GET['filter_id'] == 0) || (isset($_GET['music_genre_id']) && $_GET['music_genre_id'] > 0) || (isset($_GET['record_company_id']) && $_GET['record_company_id'] > 0)) || (!isset($new_products_category_id) || $new_products_category_id == '0') ) {
   $featured_products_query = "select distinct p.products_id, p.products_image, pd.products_name, p.master_categories_id
                            from (" . TABLE_PRODUCTS . " p
                            left join " . TABLE_FEATURED . " f on p.products_id = f.products_id

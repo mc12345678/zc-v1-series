@@ -19,7 +19,7 @@ $new_products_query = '';
 
 $display_limit = zen_get_new_date_range();
 
-if ( (($manufacturers_id > 0 && $_GET['filter_id'] == 0) || !empty($_GET['music_genre_id']) || !empty($_GET['record_company_id'])) || (!isset($new_products_category_id) || $new_products_category_id == '0') ) {
+if ( (($manufacturers_id > 0 && empty($_GET['filter_id'])) || !empty($_GET['music_genre_id']) || !empty($_GET['record_company_id'])) || empty($new_products_category_id) ) {
   $new_products_query = "SELECT DISTINCT p.products_id, p.products_image, p.products_tax_class_id, pd.products_name,
                                 p.products_date_added, p.products_price, p.products_type, p.master_categories_id
                            FROM " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
@@ -28,7 +28,7 @@ if ( (($manufacturers_id > 0 && $_GET['filter_id'] == 0) || !empty($_GET['music_
                            AND   p.products_status = 1 " . $display_limit;
 } else {
   // get all products and cPaths in this subcat tree
-  $productsInCategory = zen_get_categories_products_list( (($manufacturers_id > 0 && $_GET['filter_id'] > 0) ? zen_get_generated_category_path_rev($_GET['filter_id']) : $cPath), false, true, 0, $display_limit);
+  $productsInCategory = zen_get_categories_products_list( (($manufacturers_id > 0 && !empty($_GET['filter_id'])) ? zen_get_generated_category_path_rev($_GET['filter_id']) : $cPath), false, true, 0, $display_limit);
 
   if (is_array($productsInCategory) && sizeof($productsInCategory) > 0) {
     // build products-list string to insert into SQL query
@@ -80,7 +80,7 @@ if ($num_products_count > 0) {
   }
 
   if ($new_products->RecordCount() > 0) {
-    if (isset($new_products_category_id) && $new_products_category_id != 0) {
+    if (!empty($new_products_category_id)) {
       $category_title = zen_get_categories_name((int)$new_products_category_id);
       $title = '<h2 class="centerBoxHeading">' . sprintf(TABLE_HEADING_NEW_PRODUCTS, strftime('%B')) . ($category_title != '' ? ' - ' . $category_title : '' ) . '</h2>';
     } else {

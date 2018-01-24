@@ -13,7 +13,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 }
 
 // initialize vars
-$categories_products_id_list = '';
+$categories_products_id_list = array();
 $list_of_products = '';
 $new_products_query = '';
 
@@ -80,7 +80,7 @@ if ($num_products_count > 0) {
   }
 
   if ($new_products->RecordCount() > 0) {
-    if (isset($new_products_category_id) && $new_products_category_id != 0) {
+    if (!empty($new_products_category_id)) {
       $category_title = zen_get_categories_name((int)$new_products_category_id);
       $title = '<h2 class="centerBoxHeading">' . sprintf(TABLE_HEADING_NEW_PRODUCTS, strftime('%B')) . ($category_title != '' ? ' - ' . $category_title : '' ) . '</h2>';
     } else {
@@ -89,4 +89,4 @@ if ($num_products_count > 0) {
     $zc_show_new_products = true;
   }
 }
-?>
+

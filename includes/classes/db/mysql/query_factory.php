@@ -189,6 +189,10 @@ class queryFactory extends base {
     // eof: collect products_id queries
     global $zc_cache;
     $obj = new queryFactoryResult($this->link);
+    $forloop = false;
+    if (isset($obj->fields)) {
+      $forloop = true;
+    }
     if ($zf_limit) {
       $zf_sql = $zf_sql . ' LIMIT ' . $zf_limit;
       $obj->limit = $zf_limit;
@@ -201,7 +205,16 @@ class queryFactory extends base {
       $obj->result = $zp_result_array;
       if (sizeof($zp_result_array) > 0 ) {
         $obj->EOF = false;
-        $obj->fields = array_replace($obj->fields, $zp_result_array[0]);
+        if (!$forloop) {
+          $obj->fields = $zp_result_array[0];
+        } else {
+          foreach($zp_result_array[0] as $key => $value) {
+            $obj->fields[$key] = NULL;
+            $obj->fields[$key] = $value;
+            unset($value);
+          }
+          unset($key, $value);
+        }
       }
     } elseif ($zf_cache) {
       $zc_cache->sql_cache_expire_now($zf_sql);
@@ -229,7 +242,16 @@ class queryFactory extends base {
             }
             $zp_ii++;
           }
-          $obj->fields = array_replace($obj->fields, $obj->result[$obj->cursor]);
+          if (!$forloop) {
+            $obj->fields = $obj->result[$obj->cursor];
+          } else {
+            foreach ($obj->result[$obj->cursor] as $key => $value) {
+              $obj->fields[$key] = NULL;
+              $obj->fields[$key] = $value;
+              unset($value);
+            }
+            unset($key, $value);
+          }
           $obj->EOF = false;
         }
         unset($zp_ii);
@@ -260,10 +282,27 @@ class queryFactory extends base {
       } else {
         $obj->resource = $zp_db_resource;
         if ($obj->RecordCount() > 0) {
-          $zp_result_array = mysqli_fetch_assoc($zp_db_resource);
-          if ($zp_result_array) {
-            $obj->fields = array_replace($obj->fields, mysqli_fetch_assoc($zp_db_resource));
+          if (!$forloop) {
+            $currentObjEOF = $obj->EOF;
+            $obj->fields = mysqli_fetch_assoc($zp_db_resource);
             $obj->EOF = false;
+            if (!$obj->fields) {
+              $obj->EOF = $currentObjEOF;
+              unset($obj->fields);
+              unset($currentObjEOF);
+            }
+          } else {
+            $zp_result_array = mysqli_fetch_assoc($zp_db_resource);
+            if ($zp_result_array) {
+              foreach ($zp_result_array as $key => $value) {
+                $obj->fields[$key] = NULL;
+                $obj->fields[$key] = $value;
+                unset($value);
+              }
+              unset($key, $value);
+              $obj->EOF = false;
+            }
+            unset($zp_result_array);
           }
         }
 
@@ -614,14 +653,22 @@ class queryFactoryResult implements Countable, Iterator {
       if ($this->cursor >= sizeof($this->result)) {
         $this->EOF = true;
       } else {
-        $this->fields = array_replace($this->fields, $this->result[$this->cursor]);
+        foreach ($this->result[$this->cursor] as $key => $value) {
+          $this->fields[$key] = NULL;
+          $this->fields[$key] = $value;
+          unset($value);
+        }
       }
     } else {
       $zp_result_array = @mysqli_fetch_assoc($this->resource);
-      $this->fields = array_replace($this->fields, $zp_result_array);
       if (!$zp_result_array) {
         $this->EOF = true;
-        unset($this->fields);
+      } else {
+        foreach ($zp_result_array as $key => $value) {
+          $this->fields[$key] = NULL;
+          $this->fields[$key] = $value;
+          unset($value);
+        }
       }
     }
   }
@@ -632,7 +679,11 @@ class queryFactoryResult implements Countable, Iterator {
   public function MoveNextRandom() {
     $this->cursor++;
     if ($this->cursor < $this->limit) {
-      $this->fields = array_replace($this->fields, $this->result[$this->result_random[$this->cursor]]);
+      foreach ($this->result[$this->result_random[$this->cursor]] as $key => $value) {
+        $this->fields[$key] = NULL;
+        $this->fields[$key] = $value;
+        unset($value);
+      }
     } else {
       $this->EOF = true;
     }
@@ -642,9 +693,17 @@ class queryFactoryResult implements Countable, Iterator {
    * @see Iterator::rewind()
    */
   public function rewind() {
-      $this->EOF = ($this->RecordCount() == 0);
-      if ($this->RecordCount() !== 0) {
+      $recordCount = $this->RecordCount();
+      $this->EOF = ($recordCount == 0);
+      if ($recordCount !== 0) {
+          if (isset($this->lastMove)) {
+            $lastMove = $this->lastMove;
+          }
           $this->Move(0, false); // mc12345678 eliminate return of integer based key
+          unset($this->lastMove);
+          if (isset($lastMove)) {
+            $this->lastMove = $lastMove;
+          }
       }
   }
 
@@ -684,22 +743,38 @@ class queryFactoryResult implements Countable, Iterator {
    */
   public function Move($zp_row, $int_key = true) {
     global $db;
+    if (!isset($this->fields)) {
+      $this->fields = array();
+    }
     if ($this->is_cached) {
       if($zp_row >= sizeof($this->result)) {
         $this->cursor = sizeof($this->result);
         $this->EOF = true;
       } else {
-        $this->fields = array_replace($this->fields, $this->result[$zp_row]);
+        foreach ($this->result[$zp_row] as $key => $value) {
+          $this->fields[$key] = NULL;
+          $this->fields[$key] = $value;
+          unset($value);
+        }
         $this->cursor = $zp_row;
         $this->EOF = false;
       }
     } else if (@mysqli_data_seek($this->resource, $zp_row)) {
+      if (isset($this->lastMove)) {
+        $int_key = $this->lastMove;
+      }
       if ($int_key === true) {
-        $this->fields = array_replace($this->fields, @mysqli_fetch_array($this->resource));
+        $fieldsdata = @mysqli_fetch_array($this->resource);
       } else if ($int_key == 'only') {
-        $this->fields = array_replace($this->fields, @mysqli_fetch_row($this->resource));
+        $fieldsdata = @mysqli_fetch_row($this->resource);
       } else {
-        $this->fields = array_replace($this->fields, @mysqli_fetch_assoc($this->resource));
+        $fieldsdata = @mysqli_fetch_assoc($this->resource);
+      }
+      $this->lastMove = $int_key;
+      foreach ($fieldsdata as $key => $value) {
+        $this->fields[$key] = NULL;
+        $this->fields[$key] = $value;
+        unset($value);
       }
       $this->cursor = $zp_row;
       $this->EOF = false;

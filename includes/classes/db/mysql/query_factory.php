@@ -743,14 +743,15 @@ class queryFactoryResult implements Countable, Iterator {
    */
   public function Move($zp_row, $int_key = true) {
     global $db;
-    if (!isset($this->fields)) {
-      $this->fields = array();
-    }
+
     if ($this->is_cached) {
       if($zp_row >= sizeof($this->result)) {
         $this->cursor = sizeof($this->result);
         $this->EOF = true;
       } else {
+        if (!isset($this->fields)) {
+          $this->fields = array();
+        }
         foreach ($this->result[$zp_row] as $key => $value) {
           $this->fields[$key] = NULL;
           $this->fields[$key] = $value;
@@ -771,6 +772,9 @@ class queryFactoryResult implements Countable, Iterator {
         $fieldsdata = @mysqli_fetch_assoc($this->resource);
       }
       $this->lastMove = $int_key;
+      if (!isset($this->fields)) {
+        $this->fields = array();
+      }
       foreach ($fieldsdata as $key => $value) {
         $this->fields[$key] = NULL;
         $this->fields[$key] = $value;

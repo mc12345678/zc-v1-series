@@ -131,18 +131,29 @@ if (!isset($_SESSION['display_categories_dropdown'])) {
       }
 
       if (isset($cInfo) && is_object($cInfo) && ($categories->fields['categories_id'] == $cInfo->categories_id) ) {
-        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\''  . zen_href_link(FILENAME_CATEGORIES, zen_get_path($categories->fields['categories_id'])) . '\'">' . "\n";
+        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)">' . "\n";
       } else {
-        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . zen_href_link(FILENAME_CATEGORIES, zen_get_path($categories->fields['categories_id'])) . '\'">' . "\n";
+        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)">' . "\n";
+      }
+
+      $cInfoDefined = false;
+      if (isset($cInfo) && is_object($cInfo) && ($categories->fields['categories_id'] == $cInfo->categories_id) ) {
+        $cInfoDefined = true;
+      }
+
+      
+      $onClickRow = ' onclick="document.location.href=\'' . zen_href_link(FILENAME_CATEGORIES, zen_get_path($categories->fields['categories_id'])) . '\'"';
+      if ($cInfoDefined) {
+        $onClickRow = ' onclick="document.location.href=\'' . zen_href_link(FILENAME_CATEGORIES, zen_get_path($categories->fields['categories_id'])) . '\'"';
       }
 ?>
 <?php if ($action == '') { ?>
-                <td class="dataTableContent" width="20" align="right"><?php echo $categories->fields['categories_id']; ?></td>
+                <td class="dataTableContent" width="20" align="right" <?php echo $onClickRow ?>><?php echo $categories->fields['categories_id']; ?></td>
                 <td class="dataTableContent"><?php echo '<a href="' . zen_href_link(FILENAME_CATEGORIES, zen_get_path($categories->fields['categories_id'])) . '">' . zen_image(DIR_WS_ICONS . 'folder.gif', ICON_FOLDER) . '</a>&nbsp;<b>' . $categories->fields['categories_name'] . '</b>'; ?></td>
-                <td class="dataTableContent" align="center">&nbsp;</td>
-                <td class="dataTableContent" align="right">&nbsp;<?php echo zen_get_products_sale_discount('', $categories->fields['categories_id'], true); ?></td>
-                <td class="dataTableContent" align="center">&nbsp;</td>
-                <td class="dataTableContent" align="right" valign="bottom">
+                <td class="dataTableContent" align="center" <?php echo $onClickRow ?>>&nbsp;</td>
+                <td class="dataTableContent" align="right" <?php echo $onClickRow ?>>&nbsp;<?php echo zen_get_products_sale_discount('', $categories->fields['categories_id'], true); ?></td>
+                <td class="dataTableContent" align="center" <?php echo $onClickRow ?>>&nbsp;</td>
+                <td class="dataTableContent" align="right" <?php echo $onClickRow ?> valign="bottom">
                   <?php
                   if (SHOW_COUNTS_ADMIN == 'false') {
                     // don't show counts
@@ -173,7 +184,7 @@ if (!isset($_SESSION['display_categories_dropdown'])) {
       }
 ?>
                 </td>
-                <td class="dataTableContent" align="right"><?php echo $categories->fields['sort_order']; ?></td>
+                <td class="dataTableContent" align="right" <?php echo $onClickRow ?>><?php echo $categories->fields['sort_order']; ?></td>
                 <td class="dataTableContent" align="right">
                   <?php echo '<a href="' . zen_href_link(FILENAME_CATEGORIES, 'cPath=' . $cPath . '&cID=' . $categories->fields['categories_id'] . '&action=edit_category' . ((isset($_GET['search']) && !empty($_GET['search'])) ? '&search=' . $_GET['search'] : '')) . '">' . zen_image(DIR_WS_IMAGES . 'icon_edit.gif', ICON_EDIT) . '</a>'; ?>
                   <?php echo '<a href="' . zen_href_link(FILENAME_CATEGORIES, 'cPath=' . $cPath . '&cID=' . $categories->fields['categories_id'] . '&action=delete_category') . '">' . zen_image(DIR_WS_IMAGES . 'icon_delete.gif', ICON_DELETE) . '</a>'; ?>
@@ -325,17 +336,27 @@ if (($_GET['page'] == '1' or $_GET['page'] == '') and isset($_GET['pID']) && $_G
 // Split Page
       $type_handler = $zc_products->get_admin_handler($products->fields['products_type']);
       if (isset($pInfo) && is_object($pInfo) && ($products->fields['products_id'] == $pInfo->products_id) ) {
-        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . zen_href_link($type_handler , 'page=' . $_GET['page'] . '&product_type=' . $products->fields['products_type'] . '&cPath=' . $cPath . '&pID=' . $products->fields['products_id'] . '&action=new_product' . (isset($_GET['search']) ? '&search=' . $_GET['search'] : '')) . '\'">' . "\n";
+        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)">' . "\n";
       } else {
-        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)" onclick="document.location.href=\'' . zen_href_link($type_handler , 'page=' . $_GET['page'] . '&product_type=' . $products->fields['products_type'] . '&cPath=' . $cPath . '&pID=' . $products->fields['products_id'] . '&action=new_product' . (isset($_GET['search']) ? '&search=' . $_GET['search'] : '')) . '\'">' . "\n";
+        echo '              <tr class="dataTableRow" onmouseover="rowOverEffect(this)" onmouseout="rowOutEffect(this)">' . "\n";
+      }
+
+      $pInfoDefined = false;
+      if (isset($pInfo) && is_object($pInfo) && ($products->fields['products_id'] == $pInfo->products_id) ) {
+        $pInfoDefined = true;
+      }
+
+      $onClickRow = ' onclick="document.location.href=\'' . zen_href_link($type_handler , 'page=' . $_GET['page'] . '&product_type=' . $products->fields['products_type'] . '&cPath=' . $cPath . '&pID=' . $products->fields['products_id'] . '&action=new_product' . (isset($_GET['search']) ? '&search=' . $_GET['search'] : '')) . '\'"';
+      if ($pInfoDefined) {
+        $onClickRow = ' onclick="document.location.href=\'' . zen_href_link($type_handler , 'page=' . $_GET['page'] . '&product_type=' . $products->fields['products_type'] . '&cPath=' . $cPath . '&pID=' . $products->fields['products_id'] . '&action=new_product' . (isset($_GET['search']) ? '&search=' . $_GET['search'] : '')) . '\'"';
       }
 // Split Page
 ?>
-                <td class="dataTableContent" width="20" align="right"><?php echo $products->fields['products_id']; ?></td>
+                <td class="dataTableContent" width="20" align="right" <?php echo $onClickRow ?>><?php echo $products->fields['products_id']; ?></td>
                 <td class="dataTableContent"><?php echo '<a href="' . zen_href_link($type_handler, 'cPath=' . $cPath . '&pID=' . $products->fields['products_id'] . '&action=new_product_preview&read=only' . '&product_type=' . $products->fields['products_type'] . (isset($_GET['page']) ? '&page=' . $_GET['page'] : '')) . '">' . zen_image(DIR_WS_ICONS . 'preview.gif', ICON_PREVIEW) . '</a>&nbsp;' . $products->fields['products_name']; ?></td>
-                <td class="dataTableContent"><?php echo $products->fields['products_model']; ?></td>
-                <td colspan="2" class="dataTableContent" align="right"><?php echo zen_get_products_display_price($products->fields['products_id']); ?></td>
-                <td class="dataTableContent" align="right"><?php echo $products->fields['products_quantity']; ?></td>
+                <td class="dataTableContent" <?php echo $onClickRow ?>><?php echo $products->fields['products_model']; ?></td>
+                <td colspan="2" class="dataTableContent" align="right" <?php echo $onClickRow ?>><?php echo zen_get_products_display_price($products->fields['products_id']); ?></td>
+                <td class="dataTableContent" align="right" <?php echo $onClickRow ?>><?php echo $products->fields['products_quantity']; ?></td>
                 <td class="dataTableContent" width="50" align="left">
 <?php
       if ($products->fields['products_status'] == '1') {
@@ -357,7 +378,7 @@ if (($_GET['page'] == '1' or $_GET['page'] == '') and isset($_GET['pID']) && $_G
 ?>
                 </td>
 <?php if ($action == '') { ?>
-                <td class="dataTableContent" align="right"><?php echo $products->fields['products_sort_order']; ?></td>
+                <td class="dataTableContent" align="right" <?php echo $onClickRow ?>><?php echo $products->fields['products_sort_order']; ?></td>
                 <td class="dataTableContent" align="right">
         <?php echo '<a href="' . zen_href_link($type_handler, 'cPath=' . $cPath . '&product_type=' . $products->fields['products_type'] . '&pID=' . $products->fields['products_id']  . '&action=new_product' . (isset($_GET['search']) ? '&search=' . $_GET['search'] : '')) . '">' . zen_image(DIR_WS_IMAGES . 'icon_edit.gif', ICON_EDIT) . '</a>'; ?>
         <?php echo '<a href="' . zen_href_link($type_handler, 'cPath=' . $cPath . '&product_type=' . $products->fields['products_type'] . '&pID=' . $products->fields['products_id'] . '&action=delete_product') . '">' . zen_image(DIR_WS_IMAGES . 'icon_delete.gif', ICON_DELETE) . '</a>'; ?>

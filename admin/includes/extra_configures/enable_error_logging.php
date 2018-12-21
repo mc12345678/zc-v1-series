@@ -60,7 +60,7 @@ $debug_logfile_path = DIR_FS_LOGS . '/myDEBUG-adm-' . time() . '-' . mt_rand(100
 
 /**
  * Error reporting level to log
- * Default: E_ALL ^E_NOTICE
+ * Default (as supported): E_ALL & ~E_DEPRECATED & ~E_NOTICE & ~E_STRICT
  */
 $errors_to_log = (version_compare(PHP_VERSION, 5.3, '>=') ? E_ALL & ~E_DEPRECATED & ~E_NOTICE : version_compare(PHP_VERSION, 5.4, '>=') ? E_ALL & ~E_DEPRECATED & ~E_NOTICE & ~E_STRICT : E_ALL & ~E_NOTICE);
 

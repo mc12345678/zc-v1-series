@@ -3,14 +3,13 @@
  * authorize.net SIM payment method class
  *
  * @package paymentMethod
- * @copyright Copyright 2003-2019 Zen Cart Development Team
+ * @copyright Copyright 2003-2018 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2019-01-11 Modified in v1.5.6b $
+ * @version $Id: Drbyte Sun Jan 7 21:30:21 2018 -0500 Modified in v1.5.6 $
  */
 /**
  * authorize.net SIM payment method class
- * Ref: https://www.authorize.net/content/dam/authorize/documents/SIM_guide.pdf
  */
 class authorizenet extends base {
   /**
@@ -120,6 +119,96 @@ class authorizenet extends base {
     $this->gateway_currency = MODULE_PAYMENT_AUTHORIZENET_CURRENCY;
   }
 
+  // Authorize.net utility functions
+  // DISCLAIMER:
+  //     This code is distributed in the hope that it will be useful, but without any warranty;
+  //     without even the implied warranty of merchantability or fitness for a particular purpose.
+
+  // Main Interfaces:
+  //
+  // function InsertFP ($loginid, $txnkey, $amount, $sequence) - Insert HTML form elements required for SIM
+  // function CalculateFP ($loginid, $txnkey, $amount, $sequence, $tstamp) - Returns Fingerprint.
+
+  // compute HMAC-MD5
+  // Uses PHP mhash extension. Be sure to enable the extension
+  // function hmac ($key, $data) {
+  //   return (bin2hex (mhash(MHASH_MD5, $data, $key)));
+  //}
+
+  // Thanks is lance from http://www.php.net/manual/en/function.mhash.php
+  //lance_rushing at hot* spamfree *mail dot com
+  //27-Nov-2002 09:36
+  //
+  /**
+   * compute HMAC-MD5
+   *
+   * @param string $key
+   * @param string $data
+   * @return string
+   */
+  function hmac ($key, $data, $algo = 'sha256')
+  {
+    // RFC 2104 HMAC implementation for php.
+    // Creates an sha256 HMAC.
+    // Eliminates the need to install mhash to compute a HMAC
+    // by Lance Rushing
+
+    if (function_exists('hash_hmac')) {
+      return hash_hmac($algo, $data, $key);
+    }
+    
+    $b = 64; // byte length for md5
+    if (strlen($key) > $b) {
+      $key = pack("H*",md5($key));
+    }
+    $key  = str_pad($key, $b, chr(0x00));
+    $ipad = str_pad('', $b, chr(0x36));
+    $opad = str_pad('', $b, chr(0x5c));
+    $k_ipad = $key ^ $ipad ;
+    $k_opad = $key ^ $opad;
+
+    return md5($k_opad  . pack("H*",md5($k_ipad . $data)));
+  }
+  // end code from lance (resume authorize.net code)
+
+  public function HMACSHA512(string $key, string $textToHash) {
+    if (empty($key)) {
+        throw new ArgumentNullException("HMACSHA512: key", "Parameter cannot be empty.");
+    }
+    if (empty($textToHash)) {
+        throw new ArgumentNullException("HMACSHA512: textToHash", "Parameter cannot be empty.");
+    }
+    if (key.Length % 2 != 0 || key.Trim().Length < 2)
+    {
+        throw new ArgumentNullException("HMACSHA512: key", "Parameter cannot be odd or less than 2 characters.");
+    }
+    try
+    {
+      $k = [];
+      $x = [];
+      $hashedValue = [];
+        $x = explode('', $textZToHash);
+        foreach ($x as $value) {
+          if ($x % 2 == 0) {
+            
+          }
+        }
+        $k = Enumerable.Range(0, key.Length)
+                    .Where(x => x % 2 == 0)
+                    .Select(x => Convert.ToByte(key.Substring(x, 2), 16))
+                    .ToArray();
+        
+      
+        HMACSHA512 hmac = new HMACSHA512(k);
+        byte[] HashedValue = hmac.ComputeHash((new System.Text.ASCIIEncoding()).GetBytes(textToHash));
+        return BitConverter.ToString(HashedValue).Replace("-", string.Empty);
+    }
+    catch (Exception ex)
+    {
+        throw new Exception("HMACSHA512: " + ex.Message);
+    }
+  }
+
   /**
    * Inserts the hidden variables in the HTML FORM required for SIM
    * Invokes hmac function to calculate fingerprint.
@@ -128,18 +217,20 @@ class authorizenet extends base {
    * @param string $txnkey
    * @param float $amount
    * @param string $sequence
-   * @param string $currency
-   * @return array
+   * @param float $currency
+   * @return string
    */
   function InsertFP ($loginid, $txnkey, $amount, $sequence, $currency = "") {
     $tstamp = time ();
-    $fingerprint = hash_hmac ('md5', $loginid . "^" . $sequence . "^" . $tstamp . "^" . $amount . "^" . $currency, $txnkey);
+    $fingerprint = $this->hmac ($txnkey, $loginid . "^" . $sequence . "^" . $tstamp . "^" . $amount . "^" . $currency);
     $security_array = array('x_fp_sequence' => $sequence,
                             'x_fp_timestamp' => $tstamp,
                             'x_fp_hash' => $fingerprint);
     return $security_array;
   }
+  // end authorize.net-provided code
 
+  // class methods
   /**
    * Calculate zone matches and flag settings to determine whether this module should display to customers or not
    */
@@ -426,14 +517,14 @@ class authorizenet extends base {
     global $messageStack, $order;
     $this->authorize = $_POST;
     unset($this->authorize['btn_submit_x'], $this->authorize['btn_submit_y']);
-    $this->authorize['HashValidationValue'] = $this->formatHashedResponseCheckString($this->authorize['x_trans_id'], $this->authorize['x_amount']);
-    $this->authorize['HashMatchStatus'] = hash_equals($this->authorize['x_MD5_Hash'], $this->authorize['HashValidationValue']) ? 'PASS' : 'FAIL';
+    $this->authorize['HashValidationValue'] = $this->calc_response($this->authorize['x_trans_id'], $this->authorize['x_amount'], 'sha256');
+    $this->authorize['HashMatchStatus'] = ($this->authorize['x_MD5_Hash'] == $this->authorize['HashValidationValue']) ? 'PASS' : 'FAIL';
 
     $this->notify('NOTIFY_PAYMENT_AUTHNETSIM_POSTSUBMIT_HOOK', $this->authorize);
     $this->_debugActions($this->authorize, 'Response-Data', '', zen_session_id());
 
     // if in 'echo' mode, dump the returned data to the browser and stop execution
-    if ((defined('AUTHORIZENET_DEVELOPER_MODE') && AUTHORIZENET_DEVELOPER_MODE == 'echo') || MODULE_PAYMENT_AUTHORIZENET_DEBUGGING == 'echo') {
+    if (AUTHORIZENET_DEVELOPER_MODE == 'echo' || MODULE_PAYMENT_AUTHORIZENET_DEBUGGING == 'echo') {
       echo 'Returned Response Codes:<br /><pre>' . print_r($_POST, true) . '</pre><br />';
       die('Press the BACK button in your browser to return to the previous page.');
     }
@@ -545,13 +636,21 @@ class authorizenet extends base {
     return array('MODULE_PAYMENT_AUTHORIZENET_STATUS', 'MODULE_PAYMENT_AUTHORIZENET_LOGIN', 'MODULE_PAYMENT_AUTHORIZENET_TXNKEY', 'MODULE_PAYMENT_AUTHORIZENET_MD5HASH', 'MODULE_PAYMENT_AUTHORIZENET_TESTMODE', 'MODULE_PAYMENT_AUTHORIZENET_CURRENCY', 'MODULE_PAYMENT_AUTHORIZENET_METHOD', 'MODULE_PAYMENT_AUTHORIZENET_AUTHORIZATION_TYPE', 'MODULE_PAYMENT_AUTHORIZENET_USE_CVV', 'MODULE_PAYMENT_AUTHORIZENET_EMAIL_CUSTOMER', 'MODULE_PAYMENT_AUTHORIZENET_ZONE', 'MODULE_PAYMENT_AUTHORIZENET_ORDER_STATUS_ID', 'MODULE_PAYMENT_AUTHORIZENET_SORT_ORDER', 'MODULE_PAYMENT_AUTHORIZENET_GATEWAY_MODE', 'MODULE_PAYMENT_AUTHORIZENET_STORE_DATA', 'MODULE_PAYMENT_AUTHORIZENET_DEBUGGING');
   }
   /**
-   * Format hashed response string for validation with hash_match
+   * Calculate validity of response
    */
-  function formatHashedResponseCheckString($trans_id = '', $amount = '') {
-    if (empty($amount)) $amount = '0.00';
-    return strtoupper(hash('md5',MODULE_PAYMENT_AUTHORIZENET_MD5HASH . MODULE_PAYMENT_AUTHORIZENET_LOGIN . $trans_id . $amount));
+  function calc_md5_response($trans_id = '', $amount = '') {
+    if ($amount == '' || $amount == '0') $amount = '0.00';
+    $validating = md5(MODULE_PAYMENT_AUTHORIZENET_MD5HASH . MODULE_PAYMENT_AUTHORIZENET_LOGIN . $trans_id . $amount);
+    return strtoupper($validating);
   }
   /**
+   * Calculate validity of response
+   */
+  function calc_response($trans_id = '', $amount = '', $encryption = 'sha256') {
+    if ($amount == '' || $amount == '0') $amount = '0.00';
+    $validating = hash($encryption, MODULE_PAYMENT_AUTHORIZENET_MD5HASH . MODULE_PAYMENT_AUTHORIZENET_LOGIN . $trans_id . $amount);
+    return strtoupper($validating);
+  }  /**
    * Used to do any debug logging / tracking / storage as required.
    */
   function _debugActions($response, $mode, $order_time= '', $sessID = '') {

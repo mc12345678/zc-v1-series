@@ -1228,10 +1228,10 @@ If a special exist * 10
     // normal attributes price discounted by sales/specials or not discounted if neither a sale nor a special
     if ($pre_selected->fields["price_prefix"] == '-') {
 //      $attributes_price_final -= $pre_selected->fields["options_values_price"];
-      $attributes_price_final -= zen_get_discount_calc($pre_selected->fields["products_id"], $pre_selected->fields["products_attributes_id"], ($prod_priced_by_attr ? $products_price = zen_products_lookup($pre_selected->fields["products_id"], 'products_price') : 0) + ($prod_priced_by_attr ? -1 : 1) * $pre_selected->fields["options_values_price"]);
+      $attributes_price_final -= (!($prod_priced_by_attr && empty($pre_selected->fields["options_values_price"])) ? zen_get_discount_calc($pre_selected->fields["products_id"], $pre_selected->fields["products_attributes_id"], ($prod_priced_by_attr ? $products_price = zen_products_lookup($pre_selected->fields["products_id"], 'products_price') : 0) + ($prod_priced_by_attr ? -1 : 1) * $pre_selected->fields["options_values_price"])) : 0);
     } else {
 //      $attributes_price_final += $pre_selected->fields["options_values_price"];
-      $attributes_price_final += zen_get_discount_calc($pre_selected->fields["products_id"], $pre_selected->fields["products_attributes_id"], ($prod_priced_by_attr ? $products_price = zen_products_lookup($pre_selected->fields["products_id"], 'products_price') : 0) + $pre_selected->fields["options_values_price"]);
+      $attributes_price_final += (!($prod_priced_by_attr && empty($pre_selected->fields["options_values_price"])) ? (zen_get_discount_calc($pre_selected->fields["products_id"], $pre_selected->fields["products_attributes_id"], ($prod_priced_by_attr ? $products_price = zen_products_lookup($pre_selected->fields["products_id"], 'products_price') : 0) + $pre_selected->fields["options_values_price"])) : 0);
     }
     // qty discounts
     $attributes_price_final += zen_get_attributes_qty_prices_onetime($pre_selected->fields["attributes_qty_prices"], $qty);
@@ -1242,14 +1242,6 @@ If a special exist * 10
     */
     $display_normal_price = zen_get_discount_calc($pre_selected->fields['products_id'], $pre_selected->fields['products_attributes_id'], zen_products_lookup($pre_selected->fields['products_id'], 'products_price') + $pre_selected->fields['options_values_price']);
 
-    // if the product is priced by attributes
-    if ($prod_priced_by_attr && empty($pre_selected->fields['options_values_price'])) {
-      if ($pre_selected->fields['price_prefix'] == '-') {
-        $attributes_price_final += $display_normal_price;
-      } else {
-        $attributes_price_final -= $display_normal_price;
-      }
-    }
     $display_special_price = zen_get_products_special_price($pre_selected->fields["products_id"]);
 
     $attributes_price_final += zen_get_attributes_price_factor($display_normal_price, $display_special_price, $pre_selected->fields["attributes_price_factor"], $pre_selected->fields["attributes_price_factor_offset"]);

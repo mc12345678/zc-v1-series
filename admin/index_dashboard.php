@@ -413,8 +413,8 @@ foreach ($whos_online as $session) {
 
         $ds = $dsc = $ys = $ysc = $msc = 0;
 
-        $now = date("d/m/Y");
-        $yesterday = date("d/m/Y", strtotime('-1 days'));
+        $now = date(DATE_FORMAT);
+        $yesterday = date(DATE_FORMAT, strtotime('-1 days'));
 
         foreach ($orders as $order) {
 

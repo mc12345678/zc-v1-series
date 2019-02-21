@@ -1246,6 +1246,7 @@ class shoppingCart extends base {
 
 // validate cart contents for checkout
         if ($check_for_valid_cart == true) {
+          $this->flag_duplicate_quantity_msgs_set[(int)$prid]['min'] = false;
           $fix_once = 0;
           // Check products_status if not already
           $check_status = $products->fields['products_status'];

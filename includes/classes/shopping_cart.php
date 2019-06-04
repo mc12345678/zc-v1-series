@@ -98,7 +98,7 @@ class shoppingCart extends base {
    */
   function restore_contents() {
     global $db;
-    if (!$_SESSION['customer_id']) return false;
+    if (empty($_SESSION['customer_id'])) return false;
     $this->notify('NOTIFIER_CART_RESTORE_CONTENTS_START');
     // insert current cart contents in database
     if (is_array($this->contents)) {
@@ -573,7 +573,7 @@ class shoppingCart extends base {
     //      $products_id = zen_get_uprid($products_id, $attributes);
     unset($this->contents[$products_id]);
     // remove from database
-    if ($_SESSION['customer_id']) {
+    if (!empty($_SESSION['customer_id'])) {
 
       //        zen_db_query("delete from " . TABLE_CUSTOMERS_BASKET . " where customers_id = '" . (int)$customer_id . "' and products_id = '" . zen_db_input($products_id) . "'");
 
@@ -1973,7 +1973,7 @@ class shoppingCart extends base {
                 $products_options_file->set_output_messages('session');
                 if ($products_options_file->parse(TEXT_PREFIX . $_POST[UPLOAD_PREFIX . $i])) {
                   $products_image_extension = substr($products_options_file->filename, strrpos($products_options_file->filename, '.'));
-                  if ($_SESSION['customer_id']) {
+                  if (!empty($_SESSION['customer_id'])) {
                     $db->Execute("insert into " . TABLE_FILES_UPLOADED . " (sesskey, customers_id, files_uploaded_name) values('" . zen_session_id() . "', '" . $_SESSION['customer_id'] . "', '" . zen_db_input($products_options_file->filename) . "')");
                   } else {
                     $db->Execute("insert into " . TABLE_FILES_UPLOADED . " (sesskey, files_uploaded_name) values('" . zen_session_id() . "', '" . zen_db_input($products_options_file->filename) . "')");
@@ -2161,7 +2161,7 @@ class shoppingCart extends base {
    */
   function actionNotify($goto, $parameters) {
     global $db;
-    if ($_SESSION['customer_id']) {
+    if (!empty($_SESSION['customer_id'])) {
       if (isset($_GET['products_id'])) {
         $notify = $_GET['products_id'];
       } elseif (isset($_GET['notify'])) {
@@ -2200,7 +2200,7 @@ class shoppingCart extends base {
    */
   function actionNotifyRemove($goto, $parameters) {
     global $db;
-    if ($_SESSION['customer_id'] && isset($_GET['products_id'])) {
+    if (!empty($_SESSION['customer_id']) && isset($_GET['products_id'])) {
       $check_query = "select count(*) as count
                         from " . TABLE_PRODUCTS_NOTIFICATIONS . "
                         where products_id = '" . $_GET['products_id'] . "'
@@ -2229,7 +2229,7 @@ class shoppingCart extends base {
     global $zco_page, $messageStack;
     if ($this->display_debug_messages) $messageStack->add_session('header', 'FUNCTION ' . __FUNCTION__, 'caution');
 
-    if ($_SESSION['customer_id'] && isset($_GET['pid'])) {
+    if (!empty($_SESSION['customer_id']) && isset($_GET['pid'])) {
       if (zen_has_product_attributes($_GET['pid'])) {
         zen_redirect(zen_href_link(zen_get_info_page($_GET['pid']), 'products_id=' . $_GET['pid']));
       } else {

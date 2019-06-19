@@ -15,6 +15,9 @@ $set = (isset($_GET['set']) ? $_GET['set'] : (isset($_POST['set']) ? $_POST['set
 
 $is_ssl_protected = (substr(HTTP_SERVER, 0, 5) == 'https') ? TRUE : FALSE;
 
+$module_type = '';
+$module_key = '';
+
 if (zen_not_null($set)) {
   switch ($set) {
     case 'shipping':
@@ -52,8 +55,12 @@ if (zen_not_null($set)) {
   }
 }
 
+if (!defined('HEADING_TITLE')) {
+  define('HEADING_TITLE', '');
+}
+
 $nModule = isset($_GET['module']) ? $_GET['module'] : null;
-$notificationType = $module_type . (($nModule) ? '-' . $nModule : '') ;
+$notificationType = $module_type . (!empty($nModule) ? '-' . $nModule : '') ;
 
 $notifications = new AdminNotifications();
 $availableNotifications = $notifications->getNotifications($notificationType, $_SESSION['admin_id']);
@@ -326,12 +333,12 @@ if (zen_not_null($action)) {
               }
               $keys = substr($keys, 0, strrpos($keys, '<br><br>'));
               $heading[] = array('text' => '<h4>' . $mInfo->title . '</h4>');
-              $contents = array('form' => zen_draw_form('modules', FILENAME_MODULES, 'set=' . $set . ($_GET['module'] != '' ? '&module=' . $_GET['module'] : '') . '&action=save', 'post', 'class="form-horizontal"', true));
+              $contents = array('form' => zen_draw_form('modules', FILENAME_MODULES, 'set=' . $set . (!empty($_GET['module']) ? '&module=' . $_GET['module'] : '') . '&action=save', 'post', 'class="form-horizontal"', true));
               if (ADMIN_CONFIGURATION_KEY_ON == 1) {
                 $contents[] = array('text' => '<strong>Key: ' . $mInfo->code . '</strong><br>');
               }
               $contents[] = array('text' => $keys);
-              $contents[] = array('align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-danger" name="saveButton">' . IMAGE_UPDATE . '</button>&nbsp;<a href="' . zen_href_link(FILENAME_MODULES, 'set=' . $set . ($_GET['module'] != '' ? '&module=' . $_GET['module'] : ''), 'SSL') . '" class="btn btn-default" role="button" name="cancelButton">' . IMAGE_CANCEL . '</a>');
+              $contents[] = array('align' => 'text-center', 'text' => '<br><button type="submit" class="btn btn-danger" name="saveButton">' . IMAGE_UPDATE . '</button>&nbsp;<a href="' . zen_href_link(FILENAME_MODULES, 'set=' . $set . (!empty($_GET['module']) ? '&module=' . $_GET['module'] : ''), 'SSL') . '" class="btn btn-default" role="button" name="cancelButton">' . IMAGE_CANCEL . '</a>');
               break;
             default:
               $heading[] = array('text' => '<h4>' . $mInfo->title . '</h4>');

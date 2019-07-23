@@ -1215,6 +1215,9 @@ class shoppingCart extends base {
     if (!is_array($this->contents)) return false;
 
     $products_array = array();
+    // set/reset $this->flag_duplicate_quantity_msgs_set if the key 'keep' is empty or doesn't exist.
+    if ($check_for_valid_cart == true && empty($this->flag_duplicate_quantity_msgs_set['keep'])) $this->flag_duplicate_quantity_msgs_set = array();
+    
     foreach($this->contents as $products_id => $data) {
       $products_query = "select p.products_id, p.master_categories_id, p.products_status, pd.products_name, p.products_model, p.products_image,
                                   p.products_price, p.products_weight, p.products_tax_class_id,
@@ -1269,7 +1272,6 @@ class shoppingCart extends base {
 
 // validate cart contents for checkout
         if ($check_for_valid_cart == true) {
-          if (empty($this->flag_duplicate_quantity_msgs_set['keep'])) $this->flag_duplicate_quantity_msgs_set = array();
           $fix_once = 0;
           // Check products_status if not already
           $check_status = $products->fields['products_status'];

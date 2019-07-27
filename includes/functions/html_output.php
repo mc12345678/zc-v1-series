@@ -664,11 +664,10 @@ function zen_catalog_href_link($page = '', $parameters = '', $connection = 'NONS
  * @param array $values values
  * @param string $default default value
  * @param string $parameters parameters
- * @param boolean $required required 
+ * @param boolean $required required
  * @return string
  */
-function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false)
-{
+function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false) {
   // -----
   // Give an observer the opportunity to **totally** override this function's operation.
   //
@@ -717,8 +716,9 @@ function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = ''
   $field .= '</select>' . "\n";
 
   if ($required == true) {
-     $field .= TEXT_FIELD_REQUIRED;
-   }
+    $field .= TEXT_FIELD_REQUIRED;
+  }
+
   // -----
   // Give an observer the chance to make modifications to the just-rendered field.
   //

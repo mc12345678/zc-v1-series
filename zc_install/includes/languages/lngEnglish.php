@@ -169,7 +169,7 @@ define('TEXT_ERROR_PUB_FOLDER', DIR_FS_DOWNLOAD_PUBLIC . ' folder is not writeab
 
 define('TEXT_ERROR_CONFIGURE_REQUIRES_UPDATE', 'Your configure.php file is an old version and requires updating before we can continue.');
 
-define('TEXT_ERROR_HTACCESS_SUPPORT', 'Support for ".htaccess" files is not enabled or is not operating correctly.<br>[ <i><b>NOTE:</b> If you are using Nginx, continue to the <u>END</u> of this Installation Wizard for information on resolving this issue.<i> ]');
+define('TEXT_ERROR_HTACCESS_SUPPORT', 'Support for ".htaccess" files is not enabled in the catalog.<br>[ <i><b>NOTE:</b> If you are using Nginx, continue to the <u>END</u> of this Installation Wizard for information on resolving this issue.<i> ]');
 define('TEXT_ERROR_SESSION_SUPPORT', 'Problems with session support');
 define('TEXT_ERROR_SESSION_SUPPORT_USE_TRANS_SID', 'ini setting session.use_trans_sid is enabled');
 define('TEXT_ERROR_SESSION_SUPPORT_AUTO_START', 'ini setting session.auto_start is enabled');
@@ -203,7 +203,7 @@ define('TEXT_NAVBAR_FORUM_LINK', 'Forum');
 define('TEXT_NAVBAR_WIKI_LINK', 'Wiki');
 
 define('TEXT_HELP_TITLE_HTACCESSSUPPORT', '.htaccess support');
-define('TEXT_HELP_CONTENT_HTACCESSSUPPORT', 'There appears to be a problem with support for ".htaccess" files.<br>Sensitive files and folders on your site, that should normally be blocked by security rules in the built-in ".htaccess" files that come with Zen Cart, are currently accessible.
+define('TEXT_HELP_CONTENT_HTACCESSSUPPORT', 'There appears to be a problem with support for ".htaccess" files in the catalog.<br>Sensitive files and folders on your site, that should normally be blocked by security rules in the built-in ".htaccess" files that come with Zen Cart, are currently accessible.
 	<br><br>
 	Possible causes: 
 	<ul style="list-style-type:square">
@@ -214,7 +214,7 @@ define('TEXT_HELP_CONTENT_HTACCESSSUPPORT', 'There appears to be a problem with 
 			Support for ".htaccess" is disabled or misconfigured, or,
 		</li>
 		<li>
-			The ".htaccess" files that come with Zen Cart have not been uploaded to your site.
+			The ".htaccess" files that come with Zen Cart have not been uploaded to your site\'s catalog.
 			<br>
 			<strong>
 				<i>Files starting with ".", such as ".htaccess" files, are usually treated as "hidden" files and your FTP program may have failed to upload these if you have turned off the display and/or transfer of such hidden files in its settings.</i>

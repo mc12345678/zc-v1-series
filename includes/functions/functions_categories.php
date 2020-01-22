@@ -32,7 +32,7 @@
 
         $current_category = $db->Execute($current_category_query);
 
-        if ($last_category->fields['parent_id'] == $current_category->fields['parent_id']) {
+        if (isset($last_category->fields['parent_id']) && isset($current_category->fields['parent_id']) && $last_category->fields['parent_id'] == $current_category->fields['parent_id']) {
           for ($i=0; $i<($cp_size-1); $i++) {
             $cPath_new .= '_' . $cPath_array[$i];
           }

@@ -66,7 +66,7 @@ function zen_debug_error_handler($errno, $errstr, $errfile, $errline)
             break;
     }
 
-    if ($last_log_suffix != $this_log_suffix) {
+    if ($last_log_suffix != $this_log_suffix && (!defined('REPORT_ALL_ERRORS_FILE_ORDER') || REPORT_ALL_ERRORS_FILE_ORDER == 'Separate')) {
         $GLOBALS['debug_logfile_path'] = str_replace($last_log_suffix, $this_log_suffix, $GLOBALS['debug_logfile_path']);
         @ini_set('error_log', $GLOBALS['debug_logfile_path']);  // the filename to log errors into
         $last_log_suffix = $this_log_suffix;

@@ -36,3 +36,12 @@ if (!defined('REPORT_ALL_ERRORS_NOTICE_BACKTRACE')) {
             ('Report All Errors: Backtrace on Notice Errors?', 'REPORT_ALL_ERRORS_NOTICE_BACKTRACE', 'No', 'Include backtrace information on &quot;Notice&quot; errors?  These are usually isolated to the identified file and the backtrace information just fills the logs. Default (<b>No</b>).', 10, 42, now(), NULL, 'zen_cfg_select_option(array(\'Yes\', \'No\'),')"
     );
 }
+
+if (!defined('REPORT_ALL_ERRORS_FILE_ORDER')) {
+    $db->Execute(
+        "INSERT INTO " . TABLE_CONFIGURATION . " 
+            (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added, use_function, set_function)
+        VALUES 
+            ('Report All Errors: Backtrace Files', 'REPORT_ALL_ERRORS_FILE_ORDER', 'Separate', 'Separate Backtrace Messages across multiple files or Combine them in one? Default (<b>Separate</b>).', 10, 43, now(), NULL, 'zen_cfg_select_option(array(\'Separate\', \'Combine\'),')"
+    );
+}

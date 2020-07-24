@@ -60,12 +60,14 @@ $_SERVER['REMOTE_ADDR'] = $ipAddress;
  * start the session
  */
 $session_started = false;
+$spider_flag = true;
 if (SESSION_FORCE_COOKIE_USE == 'True') {
   setcookie('cookie_test', 'please_accept_for_session', time()+60*60*24*30, $path, (zen_not_null($cookieDomain) ? $domainPrefix . $cookieDomain : ''), $secureFlag);
 
   if (isset($_COOKIE['cookie_test'])) {
     zen_session_start();
     $session_started = true;
+    $spider_flag = false;
   }
 } elseif (SESSION_BLOCK_SPIDERS == 'True') {
   $user_agent = '';
@@ -99,6 +101,7 @@ if (SESSION_FORCE_COOKIE_USE == 'True') {
 } else {
   zen_session_start();
   $session_started = true;
+  $spider_flag = false;
 }
 unset($spiders);
 /**

@@ -384,7 +384,7 @@ function zen_draw_products_pull_down($field_name, $parameters = '', $exclude = [
  * @param int $filter_by_option_name -1|0|option_name_id
  * @return string
  */
-function zen_draw_products_pull_down_attributes($field_name, $parameters = '', $exclude = [], $order_by = 'name', $filter_by_option_name = null)
+function zen_draw_products_pull_down_attributes($field_name, $parameters = '', $exclude = [], $order_by = 'name', $filter_by_option_name = null, $show_id = false)
 {
     global $db, $currencies;
 
@@ -402,10 +402,10 @@ function zen_draw_products_pull_down_attributes($field_name, $parameters = '', $
 
     if ($order_by == 'model') {
         $order_by = 'p.products_model';
-        $output_string = '<option value="%1$u"> %3$s - %2$s (%4$s)</option>'; // format string with model first
+        $output_string = '<option value="%1$u"> %3$s - %2$s (%4$s)' . ($show_id ? ' - ID# $1$u' : '') . '</option>'; // format string with model first
     } else {
         $order_by = 'pd.products_name';
-        $output_string = '<option value="%1$u">%2$s (%3$s) (%4$s)</option>';// format string with name first
+        $output_string = '<option value="%1$u">%2$s (%3$s) (%4$s)' . ($show_id ? ' - ID# $1$u' : '') . '</option>';// format string with name first
     }
 
     $sql = "SELECT distinct p.products_id, pd.products_name, p.products_price" . $new_fields . "

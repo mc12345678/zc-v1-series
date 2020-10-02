@@ -746,7 +746,7 @@ function translate_type_to_name($opt_type)
                         <div class="col-sm-7">
                             <?php
                             echo zen_draw_label(TEXT_SELECT_PRODUCT, 'product_to_update_add', 'class="control-label"') . '<br>';
-                            echo zen_draw_products_pull_down_attributes('product_to_update', 'size="5" class="form-control" id="product_to_update_add" required', '', $products_order_by, $selectedOptionId);
+                            echo zen_draw_products_pull_down_attributes('product_to_update', 'size="5" class="form-control" id="product_to_update_add" required', '', $products_order_by, $selectedOptionId, true);
                             if ($selectedOptionId !== '') {
                                 $products_sort_link = ($products_order_by === 'name' ?
                                     '<a href="' . zen_href_link(FILENAME_OPTIONS_NAME_MANAGER, zen_get_all_get_params(['products_order_by']) . '&products_order_by=model#addOptionValuesOneWrapper') . '">' . TEXT_ORDER_BY . ' ' . TABLE_HEADING_MODEL . '</a>' :
@@ -845,7 +845,7 @@ function translate_type_to_name($opt_type)
                         <div class="col-sm-7">
                             <?php
                             echo zen_draw_label(TEXT_SELECT_PRODUCT, 'product_to_update_delete', 'class="control-label"') . '<br>';
-                            echo zen_draw_products_pull_down_attributes('product_to_update', 'size="5" class="form-control" id="product_to_update_delete" required', '', $products_order_by, $selectedOptionId);
+                            echo zen_draw_products_pull_down_attributes('product_to_update', 'size="5" class="form-control" id="product_to_update_delete" required', '', $products_order_by, $selectedOptionId, true);
                             if ($selectedOptionId !== '') {
                                 $products_sort_link = ($products_order_by === 'name' ?
                                     '<a href="' . zen_href_link(FILENAME_OPTIONS_NAME_MANAGER, zen_get_all_get_params(['products_order_by']) . '&products_order_by=model#deleteOptionValuesOneWrapper') . '">' . TEXT_ORDER_BY . ' ' . TABLE_HEADING_MODEL . '</a>' :

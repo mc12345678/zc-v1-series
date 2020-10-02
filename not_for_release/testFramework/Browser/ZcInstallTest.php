@@ -3,19 +3,46 @@
 namespace Tests\Browser;
 
 use Tests\Browser\Pages\zcInstallPage;
-use Tests\Browser\DuskTestCase;
 use Laravel\Dusk\Browser;
+use Tests\Browser\Traits\ConfigureFileConcerns;
+use Tests\Browser\Traits\DatabaseConcerns;
 
 class ZcInstallTest extends DuskTestCase
 {
+    use ConfigureFileConcerns;
+    use DatabaseConcerns;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->makeEmptyConfigures(DIR_FS_ROOT);
+        $this->createDatabase();
+    }
+
     /** @test */
-    public function zcinstall_page_displays()
+    public function do_a_full_install()
     {
         $this->browse(function (Browser $browser) {
             $browser->resize(1920, 1080);
-            $browser->visit(new zcInstallPage)
-                    ->assertSee('System Inspection');
+            $browser->visit(new ZcInstallPage)
+                ->assertSee('System Inspection')
+                ->click('#btnsubmit')
+                ->assertSee('Admin Settings')
+                ->check('#agreeLicense')
+                ->click('#btnsubmit')
+                ->type('#db_host', TESTING_DB_SERVER)
+                ->type('#db_user', TESTING_DB_SERVER_USERNAME)
+                ->type('#db_password', TESTING_DB_SERVER_PASSWORD)
+                ->type('#db_name', TESTING_DB_DATABASE)
+                ->click('#btnsubmit')
+                ->waitFor('#admin_user', 1000)
+                ->type('#admin_user', ADMIN_NAME)
+                ->type('#admin_email', ADMIN_EMAIL)
+                ->type('#admin_email2', ADMIN_EMAIL)
+                ->click('#btnsubmit')
+                ->assertSee('Setup Complete')
+            ;
         });
     }
-
 }

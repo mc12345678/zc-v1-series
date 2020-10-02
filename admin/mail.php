@@ -7,8 +7,7 @@
  */
 require('includes/application_top.php');
 
-//DEBUG:  // these defines will become configuration switches in ADMIN in a future version.
-//DEBUG:  // right now, attachments aren't working right unless only sending HTML messages with NO text-only version supplied.
+// the following are marked as false because they are not fully implemented in this page
 if (!defined('EMAIL_ATTACHMENTS_ENABLED')) {
   define('EMAIL_ATTACHMENTS_ENABLED', false);
 }
@@ -86,15 +85,15 @@ if (EMAIL_ATTACHMENTS_ENABLED && $action == 'preview') {
 } //end attachments upload
 // error detection
 if ($action == 'preview') {
-  if (!isset($_POST['customers_email_address'])) {
+  if (empty($_POST['customers_email_address'])) {
     $messageStack->add(ERROR_NO_CUSTOMER_SELECTED, 'error');
   }
 
-  if (!$_POST['subject']) {
+  if (empty($_POST['subject'])) {
     $messageStack->add(ERROR_NO_SUBJECT, 'error');
   }
 
-  if (!$_POST['message'] && !$_POST['message_html']) {
+  if (empty($_POST['message']) && empty($_POST['message_html'])) {
     $messageStack->add(ENTRY_NOTHING_TO_SEND, 'error');
   }
 }

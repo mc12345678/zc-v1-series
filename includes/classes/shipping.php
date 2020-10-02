@@ -19,7 +19,7 @@ class shipping extends base {
   var $modules;
 
   function __construct($module = null) {
-      global $PHP_SELF, $messageStack;
+      global $PHP_SELF, $messageStack, $languageLoader;
 
       if (defined('MODULE_SHIPPING_INSTALLED') && !empty(MODULE_SHIPPING_INSTALLED)) {
         $this->modules = explode(';', MODULE_SHIPPING_INSTALLED);
@@ -48,8 +48,8 @@ class shipping extends base {
         } else {
           $lang_file = zen_get_file_directory(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/shipping/', $include_modules[$i]['file'], 'false');
         }
-        if (@file_exists($lang_file)) {
-          include_once($lang_file);
+          if ($languageLoader->hasLanguageFile(DIR_FS_CATALOG . DIR_WS_LANGUAGES,  $_SESSION['language'], $include_modules[$i]['file'], '/modules/shipping')) {
+              $languageLoader->loadExtraLanguageFiles(DIR_FS_CATALOG . DIR_WS_LANGUAGES,  $_SESSION['language'], $include_modules[$i]['file'], '/modules/shipping');
         } else {
           if (is_object($messageStack)) {
             if (IS_ADMIN_FLAG === false) {
@@ -112,14 +112,6 @@ class shipping extends base {
       // SHIPPING_BOX_WEIGHT = tare
       // SHIPPING_BOX_PADDING = Large Box % increase
       // SHIPPING_MAX_WEIGHT = Largest package
-
-      /*
-      if (SHIPPING_BOX_WEIGHT >= $shipping_weight*SHIPPING_BOX_PADDING/100) {
-        $shipping_weight = $shipping_weight+SHIPPING_BOX_WEIGHT;
-      } else {
-        $shipping_weight = $shipping_weight + ($shipping_weight*SHIPPING_BOX_PADDING/100);
-      }
-      */
 
       switch (true) {
         // large box add padding

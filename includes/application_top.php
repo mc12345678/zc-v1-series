@@ -4,17 +4,15 @@
  *
  * Initializes common classes & methods. Controlled by an array which describes
  * the elements to be initialised and the order in which that happens.
- * see {@link  http://www.zen-cart.com/wiki/index.php/Developers_API_Tutorials#InitSystem wikitutorials} for more details.
- *
+ * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: Zcwilt 2020 Jun 08 Modified in v1.5.7 $
+ * @version $Id: Zcwilt 2020 Jun 08 Modified in v1.5.8 $
  */
 use Zencart\FileSystem\FileSystem;
 use Zencart\PluginManager\PluginManager;
 use Zencart\InitSystem\InitSystem;
-use Zencart\LanguageLoader\CatalogLanguageLoader;
 
 /**
  * inoculate against hack attempts which waste CPU cycles
@@ -54,7 +52,7 @@ if ($contaminated)
   exit(0);
 }
 unset($contaminated, $len);
-/* *** END OF INNOCULATION *** */
+/* *** END OF INOCULATION *** */
 /**
  * boolean used to see if we are in the admin script, obviously set to false here.
  */
@@ -67,11 +65,10 @@ define('PAGE_PARSE_START_TIME', microtime());
 @ini_set("html_errors","0");
 /**
  * Ensure minimum PHP version.
- * This is intended to run before any dependencies like short-array-syntax are loaded, in order to avoid unfriendly fatal errors caused by such incompatibility.
- * This version of Zen Cart actually requires newer than PHP 5.4, but we are only enforcing 5.4 here at this stage for the sake of this syntax matter.
+ * This is intended to run before any dependencies are required
  * See https://www.zen-cart.com/requirements or run zc_install to see actual requirements!
  */
-if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50400) {
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 70205) {
     require 'includes/templates/template_default/templates/tpl_zc_phpupgrade_default.php';
     exit(0);
 }
@@ -96,13 +93,10 @@ define('DEBUG_AUTOLOAD', false);
  */
 if (DEBUG_AUTOLOAD || (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true)) {
   @ini_set('display_errors', TRUE);
-  error_reporting(E_ALL);
+  error_reporting(defined('STRICT_ERROR_REPORTING_LEVEL') ? STRICT_ERROR_REPORTING_LEVEL : E_ALL);
 } else {
-  error_reporting(0);
+    error_reporting(0);
 }
-/*
- * Get time zone info from PHP config
- */
 @date_default_timezone_set(date_default_timezone_get());
 /**
  * check for and include load application parameters
@@ -173,7 +167,7 @@ if (( (!file_exists('includes/configure.php') && !file_exists('includes/local/co
  * psr-4 autoloading
  */
 require DIR_FS_CATALOG . DIR_WS_CLASSES . 'vendors/AuraAutoload/src/Loader.php';
-require DIR_FS_CATALOG . 'app/vendor/autoload.php';
+require DIR_FS_CATALOG . 'laravel/vendor/autoload.php';
 $psr4Autoloader = new \Aura\Autoload\Loader;
 $psr4Autoloader->register();
 require('includes/psr4Autoload.php');
@@ -188,10 +182,11 @@ require 'includes/init_includes/init_file_db_names.php';
 require 'includes/init_includes/init_database.php';
 require DIR_FS_CATALOG . 'includes/illuminate_bootstrap.php';
 
-$pluginManager = new PluginManager($db);
-$installedPlugins = $pluginManager->getInstalledPlugins();
+$installedPlugins = $laravelApp->make('installedPlugins');
+$pluginManager = new PluginManager(new App\Models\PluginControl, new App\Models\PluginControlVersion);
 
-$fs = FileSystem::getInstance();
+$fs = new FileSystem;
+$fs->loadFilesFromPluginsDirectory($installedPlugins, 'catalog/includes/extra_configures', '~^[^\._].*\.php$~i');
 $fs->loadFilesFromPluginsDirectory($installedPlugins, 'catalog/includes/extra_datafiles', '~^[^\._].*\.php$~i');
 
 foreach ($installedPlugins as $plugin) {
@@ -204,6 +199,7 @@ foreach ($installedPlugins as $plugin) {
     $psr4Autoloader->addPrefix($namespaceCatalog, $filePathCatalog);
 }
 
+
 $autoLoadConfig = array();
 if (isset($loaderPrefix)) {
     $loaderPrefix = preg_replace('/[^a-z_]/', '', $loaderPrefix);
@@ -211,7 +207,7 @@ if (isset($loaderPrefix)) {
     $loaderPrefix = 'config';
 }
 $loader_file = $loaderPrefix . '.core.php';
-$initSystem = new InitSystem('catalog', $loaderPrefix, FileSystem::getInstance(), $pluginManager, $installedPlugins);
+$initSystem = new InitSystem('catalog', $loaderPrefix, new FileSystem, $pluginManager, $installedPlugins);
 
 if (defined('DEBUG_AUTOLOAD') && DEBUG_AUTOLOAD == true) $initSystem->setDebug(true);
 
@@ -223,7 +219,7 @@ require(DIR_FS_CATALOG . 'includes/autoload_func.php');
 /**
  * load the counter code
 **/
-if ($spider_flag == false) {
+if (empty($spider_flag)) {
 // counter and counter history
   require(DIR_WS_INCLUDES . 'counter.php');
 }

@@ -17,7 +17,7 @@ if (!defined('IS_ADMIN_FLAG')) {
  * @package general
  */
  class zen_SiteMapTree {
-   var $root_category_id = 0,
+   var $root_category_id = TOPMOST_CATEGORY_PARENT_ID,
        $max_level = 0,
        $data = array(),
        $root_start_string = '',
@@ -48,6 +48,8 @@ if (!defined('IS_ADMIN_FLAG')) {
    }
 
    function buildBranch($parent_id, $level = 0, $parent_link = '') {
+    $parent_id = (int)$parent_id;
+    $level = (int)$level;
     $result = $this->parent_group_start_string;
 
     if (isset($this->data[$parent_id])) {

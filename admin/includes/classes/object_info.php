@@ -31,6 +31,7 @@ class objectInfo
         foreach ($object_array as $key => $value) {
             $this->$key = zen_db_prepare_input($value);
         }
+        $this->object_array = $object_array;
     }
 
     /**
@@ -55,6 +56,10 @@ class objectInfo
         $this->$field = $value;
     }
 
+    /**
+     * @param $field
+     * @return array|string
+     */
     public function __get($field)
     {
         if (isset($this->$field)) return $this->$field;

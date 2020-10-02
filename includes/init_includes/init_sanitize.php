@@ -1,13 +1,15 @@
 <?php
 /**
  * sanitize the GET parameters
- * see {@link  http://www.zen-cart.com/wiki/index.php/Developers_API_Tutorials#InitSystem wikitutorials} for more details.
- *
+ * see  {@link  https://docs.zen-cart.com/dev/code/init_system/} for more details.
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: DrByte 2020 May 17 Modified in v1.5.7 $
  */
+
+use Zencart\PageLoader\PageLoader;
+use Zencart\FileSystem\FileSystem;
 
   if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
@@ -103,22 +105,29 @@
       zen_redirect(zen_href_link($_GET['main_page'], 'products_id=' . $_GET['products_id']));
     }
   }
- 
+
   $_SESSION['check_valid_prod'] = true;
 /**
  * We do some checks here to ensure $_GET['main_page'] has a sane value
  */
   if (empty($_GET['main_page'])) $_GET['main_page'] = 'index';
 
-  if (!is_dir(DIR_WS_MODULES .  'pages/' . $_GET['main_page'])) {
+  $pageLoader = PageLoader::getInstance();
+  $pageLoader->init($installedPlugins, $_GET['main_page'], new FileSystem);
+
+  $pageDir = $pageLoader->findModulePageDirectory();
+  if ( $pageDir === false) {
     if (MISSING_PAGE_CHECK == 'On' || MISSING_PAGE_CHECK == 'true') {
-      $_GET['main_page'] = 'index';
+      zen_redirect(zen_href_link(FILENAME_DEFAULT));
     } elseif (MISSING_PAGE_CHECK == 'Page Not Found') {
       header('HTTP/1.1 404 Not Found');
-      $_GET['main_page'] = FILENAME_PAGE_NOT_FOUND;
+      zen_redirect(zen_href_link(FILENAME_PAGE_NOT_FOUND));
     }
   }
+
   $current_page = $_GET['main_page'];
   $current_page_base = $current_page;
-  $code_page_directory = DIR_WS_MODULES . 'pages/' . $current_page_base;
+  $code_page_directory = $pageDir;
   $page_directory = $code_page_directory;
+
+$sanitizedRequest = Request::capture();

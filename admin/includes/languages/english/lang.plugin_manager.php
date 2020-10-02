@@ -26,11 +26,14 @@ $define = [
     'TEXT_INFO_SELECT_CLEAN' => 'Select versions you want to remove',
     'TEXT_INSTALLED_ENABLED' => 'Installed(Enabled)',
     'TEXT_INSTALLED_DISABLED' => 'Installed(Disabled)',
+    'TEXT_ALL_STATUSES' => 'All',
     'TEXT_NOT_INSTALLED' => 'Not Installed',
     'TEXT_INSTALL_SUCCESS' => 'Plugin installed successfully',
     'TEXT_UNINSTALL_SUCCESS' => 'Plugin un-installed successfully',
+    'TEXT_UPGRADE_SUCCESS' => 'Plugin upgraded successfully',
     'TEXT_DISABLE_SUCCESS' => 'Plugin disabled successfully',
     'TEXT_ENABLE_SUCCESS' => 'Plugin enabled successfully',
+    'TEXT_CLEANUP_SUCCESS' => 'Directories successfully removed',
     'TEXT_UPGRADE_AVAILABLE' => 'Upgrade Available',
     'TEXT_VERSION_INSTALLED' => 'Version Installed: %s',
     'TEXT_CONFIRM_UNINSTALL' => 'Are you sure you want to uninstall this plugin?',
@@ -39,8 +42,9 @@ $define = [
     'TEXT_CONFIRM_ENABLE' => 'Are you sure you want to enable this plugin?',
     'TEXT_INFO_UPGRADE' => 'Please select the version you want to upgrade to.',
     'TEXT_INFO_UPGRADE_CONFIRM' => 'Upgrade version %s',
-    'TEXT_INFO_UPGRADE_WARNING' => 'Warning: blah blah',
+    'TEXT_INFO_UPGRADE_WARNING' => '',
     'TEXT_INFO_CONFIRM_CLEAN' => 'Confirm version directories to clean/remove',
+    'TEXT_LABEL_STATUS' => 'Status: ',
 ];
 
 return $define;

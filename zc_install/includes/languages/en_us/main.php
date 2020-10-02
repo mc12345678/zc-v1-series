@@ -3,9 +3,8 @@
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2020 Jun 19 Modified in v1.5.7 $
+ * @version $Id: DrByte 2020 Jun 19 Modified in v1.5.8 $
  */
-
 
 return [
 'META_TAG_TITLE' => 'Zen Cart&reg; Installer',
@@ -133,11 +132,13 @@ return [
 'TEXT_ERROR_COULD_NOT_WRITE_CONFIGFILE' => 'Could not write the generated config file: %s. Please ensure the file exists and is writable.',
 'TEXT_ERROR_STORE_CONFIGURE' => 'Catalog /includes/configure.php file either does not exist, is not readable or is not writeable',
 'TEXT_ERROR_ADMIN_CONFIGURE' => 'Admin /admin/includes/configure.php file either does not exist, is not readable or is not writeable',
-'TEXT_ERROR_PHP_VERSION' => str_replace(["\n", "\r"], '', 'Incorrect PHP Version.<p>The PHP version you are using (' . PHP_VERSION . ') is not suitable.</p><p>This version of Zen Cart&reg; is compatible with PHP versions 5.6 to 7.4.x, although 7.2.x or higher is recommended.<br>Check the <a href="https://www.zen-cart.com">www.zen-cart.com</a> website for the latest version of Zen Cart&reg;.</p><p>For more information about version compatibility and server requirements see <a href="https://docs.zen-cart.com/user/first_steps/server_requirements/">Zen Cart Server Requirements</a></p>'),
+'TEXT_ERROR_PHP_VERSION' => str_replace(["\n", "\r"], '', 'Incorrect PHP Version.<p>The PHP version you are using (' . PHP_VERSION . ') is not suitable.</p><p>This version of Zen Cart&reg; is compatible with PHP versions 7.3 to 8.0, although 7.4.x or higher is recommended.<br>Check the <a href="https://www.zen-cart.com">www.zen-cart.com</a> website for the latest version of Zen Cart&reg;.</p><p>For more information about version compatibility and server requirements see <a href="https://docs.zen-cart.com/user/first_steps/server_requirements/">Zen Cart Server Requirements</a></p>'),
 'TEXT_ERROR_PHP_VERSION_RECOMMENDED' => '<p>For maximum security and compatibility you should be using PHP %s or newer. This installation can proceed, but note that your site will not be PCI Compliant when running out-of-date software.</p><p>Consult the <a href="https://php.net">PHP Website</a> for specifics.</p><p>For more information about version compatibility and server requirements see <a href="https://docs.zen-cart.com/user/first_steps/server_requirements/">Zen Cart Server Requirements</a></p>',
 'TEXT_ERROR_PHP_VERSION_MIN' => 'PHP Version should be greater than %s',
 'TEXT_ERROR_PHP_VERSION_MAX' => 'PHP Version should be less than %s',
 'TEXT_ERROR_MYSQL_SUPPORT' => 'Problems with your MySQL (mysqli) support. Your server appears to be missing the mysqli extension for PHP, and without it we cannot connect to your database. Talk to your hosting company for assistance.',
+'TEXT_ERROR_PDOMYSQL_SUPPORT' => 'Problems with your MySQL (pdo_mysql) support. Your server appears to be missing the pdo_mysql extension for PHP, and without it we cannot connect to your database. Talk to your hosting company for assistance.',
+'TEXT_ERROR_PDOSQLITE_SUPPORT' => 'Your server appears to be missing the pdo_sqlite extension for PHP which is used for small temporary storage and for application testing. Talk to your hosting company for assistance.',
 'TEXT_ERROR_LOG_FOLDER' => DIR_FS_LOGS . ' folder is not writeable',
 'TEXT_ERROR_CACHE_FOLDER' => DIR_FS_SQL_CACHE . ' folder is not writeable',
 'TEXT_ERROR_IMAGES_FOLDER' => '/images/ folder is not writeable',
@@ -154,6 +155,8 @@ return [
 'TEXT_ERROR_DB_CONNECTION_UPGRADE' => 'Problems with database connection based on the entries in your current configure.php',
 'TEXT_ERROR_SET_TIME_LIMIT' => 'max_execution_time setting disabled',
 'TEXT_ERROR_GD' => 'GD Extension not enabled',
+'TEXT_ERROR_JSON' => 'JSON Extension not enabled. Required for parsing data in many parts of the application.',
+'TEXT_ERROR_FILEINFO' => 'Fileinfo extension not enabled. Used for calculating file sizes.',
 'TEXT_ERROR_ZLIB' => 'Zlib Extension not enabled',
 'TEXT_ERROR_OPENSSL' => 'Openssl Extension not enabled',
 'TEXT_ERROR_CURL' => 'Problems with the CURL extension - PHP is reporting that CURL is not present.',

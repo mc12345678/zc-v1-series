@@ -37,18 +37,16 @@ abstract class DuskTestCase extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         if (!defined('DIR_FS_ROOT')) {
-            define('DIR_FS_ROOT', \getcwd());
-
-            if (file_exists($configFile = 'includes/local/configure.dusk.php')) {
+            define('DIR_FS_ROOT', \getcwd() . '/');
+            //echo 'DIR_FS_ROOT = ' . DIR_FS_ROOT;
+            $user = $_SERVER['USER'];
+            $configFile = 'NO CONFIG FILE FOUND';
+            if (file_exists($configFile = DIR_FS_ROOT . '/not_for_release/testFramework/Browser/duskConfigures/' . $user . '.configure.dusk.php')) {
                 require $configFile;
-            } elseif (file_exists($configFile = 'includes/local/configure.php')) {
-                require $configFile;
-            } elseif (file_exists($configFile = 'not_for_release/testFramework/configure.dusk.php')) {
-                require $configFile;
-            } elseif (file_exists($configFile = 'includes/configure.php')) {
+            } elseif (file_exists($configFile = DIR_FS_ROOT . '/not_for_release/testFramework/Browser/duskConfigures/configure.dusk.php')) {
                 require $configFile;
             }
-//            echo 'Using config file: ' . $configFile;
+            //echo 'Using Config file ' . $configFile;
         }
 
         Browser::$baseUrl = $this->baseUrl();
@@ -110,7 +108,7 @@ abstract class DuskTestCase extends \PHPUnit\Framework\TestCase
     /**
      * Start the Chromedriver process.
      *
-     * @param  array $arguments
+     * @param array $arguments
      * @return void
      *
      * @throws \RuntimeException
@@ -141,7 +139,7 @@ abstract class DuskTestCase extends \PHPUnit\Framework\TestCase
     /**
      * Build the process to run the Chromedriver.
      *
-     * @param  array $arguments
+     * @param array $arguments
      * @return \Symfony\Component\Process\Process
      *
      * @throws \RuntimeException
@@ -154,7 +152,7 @@ abstract class DuskTestCase extends \PHPUnit\Framework\TestCase
     /**
      * Set the path to the custom Chromedriver.
      *
-     * @param  string $path
+     * @param string $path
      * @return void
      */
     public static function useChromedriver($path)
@@ -172,4 +170,5 @@ abstract class DuskTestCase extends \PHPUnit\Framework\TestCase
         throw new Exception("User resolver has not been set.");
     }
 
-}
+
+ }

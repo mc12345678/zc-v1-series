@@ -13,21 +13,21 @@ $parameters = [
   'categories_name' => '',
   'categories_description' => '',
   'categories_image' => '',
-  'sort_order' => ''
+  'sort_order' => '',
 ];
 $cInfo = new objectInfo($parameters);
 
 $categoryId = (isset($_GET['cID']) ? (int)$_GET['cID'] : '');
-if ($categoryId != '') {
+if (!empty($categoryId)) {
   $category = $db->Execute("SELECT c.categories_id, cd.categories_name, cd.categories_description, c.categories_image,
                                    c.sort_order, c.date_added, c.last_modified
-                            FROM " . TABLE_CATEGORIES . " c, " . TABLE_CATEGORIES_DESCRIPTION . " cd
+                            FROM " . TABLE_CATEGORIES . " c
+                            LEFT JOIN " . TABLE_CATEGORIES_DESCRIPTION . " cd USING (categories_id)
                             WHERE c.categories_id = " . $categoryId . "
-                            AND c.categories_id = cd.categories_id
                             AND cd.language_id = " . (int)$_SESSION['languages_id']);
   $cInfo->updateObjectInfo($category->fields);
 }
-$action = (isset($_GET['action']) ? $_GET['action'] : '');
+$action = $_GET['action'] ?? '';
 
 if (isset($_GET['page'])) {
   $_GET['page'] = (int)$_GET['page'];
@@ -112,6 +112,7 @@ if (zen_not_null($action)) {
                 WHERE categories_id = '" . (int)$categories_id . "'";
 
         $parent_cat = $db->Execute($sql);
+        // @TODO - should this be checking against TOPMOST_CATEGORY_PARENT_ID?
         if ($parent_cat->fields['parent_id'] != '0') {
           $sql = "SELECT *
                   FROM " . TABLE_PRODUCT_TYPES_TO_CATEGORY . "
@@ -385,7 +386,7 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
         <hr>
             <h2><?php echo TEXT_CATEGORIES_IMAGE; ?></h2>
             <?php
-            if (!empty($cInfo->categories_image)) { ?>
+            if (!empty($cInfo->categories_image) && file_exists(DIR_FS_CATALOG_IMAGES . $cInfo->categories_image)) { ?>
                 <div class="form-group">
                     <div class="col-sm-offset-3 col-sm-9 col-md-6">
                         <div><?php echo zen_info_image($cInfo->categories_image, $cInfo->categories_name, '', '', 'class="table-bordered img-responsive"'); ?></div>
@@ -499,7 +500,7 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
                 ?>
               <div class="input-group">
                 <span class="input-group-addon"><?php echo zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']); ?></span>
-                <?php echo zen_draw_input_field('metatags_title[' . $languages[$i]['id'] . ']', htmlspecialchars(zen_get_category_metatags_title($cInfo->categories_id, $languages[$i]['id']), ENT_COMPAT, CHARSET, TRUE), zen_set_field_length(TABLE_METATAGS_CATEGORIES_DESCRIPTION, 'metatags_title') . ' class="form-control" id="metatags_title[' . $languages[$i]['id'] . ']"');
+                <?php echo zen_draw_input_field('metatags_title[' . $languages[$i]['id'] . ']', htmlspecialchars(zen_get_category_metatag_fields($cInfo->categories_id, $languages[$i]['id'], 'metatags_title'), ENT_COMPAT, CHARSET, TRUE), zen_set_field_length(TABLE_METATAGS_CATEGORIES_DESCRIPTION, 'metatags_title') . ' class="form-control" id="metatags_title[' . $languages[$i]['id'] . ']"');
                 ?>
               </div>
               <br>
@@ -516,7 +517,7 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
                 ?>
               <div class="input-group">
                 <span class="input-group-addon" style="vertical-align: top;"><?php echo zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']); ?></span>
-                <?php echo zen_draw_textarea_field('metatags_keywords[' . $languages[$i]['id'] . ']', 'soft', '100', '3', htmlspecialchars(zen_get_category_metatags_keywords($cInfo->categories_id, $languages[$i]['id']), ENT_COMPAT, CHARSET, TRUE), 'class="form-control noEditor" id="metatags_keywords[' . $languages[$i]['id'] . ']"');
+                <?php echo zen_draw_textarea_field('metatags_keywords[' . $languages[$i]['id'] . ']', 'soft', '100', '3', htmlspecialchars(zen_get_category_metatag_fields($cInfo->categories_id, $languages[$i]['id'], 'metatags_keywords'), ENT_COMPAT, CHARSET, TRUE), 'class="form-control noEditor" id="metatags_keywords[' . $languages[$i]['id'] . ']"');
                 ?>
               </div>
               <br>
@@ -533,7 +534,7 @@ if (is_dir(DIR_FS_CATALOG_IMAGES)) {
                 ?>
               <div class="input-group">
                 <span class="input-group-addon" style="vertical-align: top"><?php echo zen_image(DIR_WS_CATALOG_LANGUAGES . $languages[$i]['directory'] . '/images/' . $languages[$i]['image'], $languages[$i]['name']); ?></span>
-                <?php echo zen_draw_textarea_field('metatags_description[' . $languages[$i]['id'] . ']', 'soft', '100', '7', htmlspecialchars(zen_get_category_metatags_description($cInfo->categories_id, $languages[$i]['id']), ENT_COMPAT, CHARSET, TRUE), 'class="form-control noEditor" id="metatags_description[' . $languages[$i]['id'] . ']"');
+                <?php echo zen_draw_textarea_field('metatags_description[' . $languages[$i]['id'] . ']', 'soft', '100', '7', htmlspecialchars(zen_get_category_metatag_fields($cInfo->categories_id, $languages[$i]['id'], 'metatags_description'), ENT_COMPAT, CHARSET, TRUE), 'class="form-control noEditor" id="metatags_description[' . $languages[$i]['id'] . ']"');
                 ?>
               </div>
               <br>

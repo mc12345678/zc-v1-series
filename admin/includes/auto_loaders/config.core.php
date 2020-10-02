@@ -80,6 +80,9 @@ if (!defined('USE_PCONNECT')) define('USE_PCONNECT', 'false');
   $autoLoadConfig[0][] = array('autoType'=>'class',
                                'loadFile'=> 'WhosOnline.php',
                                'classPath'=>DIR_WS_CLASSES);
+  $autoLoadConfig[0][] = array('autoType'=>'class',
+                               'loadFile'=> 'Customer.php',
+                               'classPath'=>DIR_FS_CATALOG . DIR_WS_CLASSES);
 
 /**
  * Breakpoint 10.
@@ -196,14 +199,16 @@ if (!defined('USE_PCONNECT')) define('USE_PCONNECT', 'false');
  * Breakpoint 90.
  *
  * $zc_products = new products();
- * require(DIR_WS_FUNCTIONS . 'localization.php');
+ * require(DIR_WS_FUNCTIONS . 'datepicker.php');
  *
  */
   $autoLoadConfig[90][] = array('autoType'=>'classInstantiate',
                                 'className'=>'products',
                                 'objectName'=>'zc_products');
   $autoLoadConfig[90][] = array('autoType'=>'require',
-                                 'loadFile'=> DIR_WS_FUNCTIONS . 'localization.php');
+                              'loadFile'=> DIR_WS_FUNCTIONS . 'datepicker.php');
+  $autoLoadConfig[90][] = array('autoType'=>'require',
+                                'loadFile'=> DIR_FS_CATALOG . DIR_WS_FUNCTIONS . 'functions_exchange_rates.php');
 /**
  * Breakpoint 100.
  *

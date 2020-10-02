@@ -20,6 +20,7 @@ class order extends base {
       $products_ordered, $products_ordered_email, $products_ordered_html, $attachArray, $email_order_message, $extra_header_text,
       $doStockDecrement, $send_low_stock_emails, $queryReturnFlag, $bestSellersUpdate, $use_external_tax_handler_only;
   var $products_ordered_attributes_html = array();
+  var $statuses = [];
 
   function __construct($order_id = null) {
     $this->info = array();
@@ -88,6 +89,7 @@ class order extends base {
     }
 
     $this->info = array('order_id' => $this->orderId,
+                        'customer_id' => $order->fields['customers_id'],
                         'currency' => $order->fields['currency'],
                         'currency_value' => $order->fields['currency_value'],
                         'payment_method' => $order->fields['payment_method'],
@@ -120,7 +122,8 @@ class order extends base {
                             'country' => $order->fields['customers_country'],
                             'format_id' => $order->fields['customers_address_format_id'],
                             'telephone' => $order->fields['customers_telephone'],
-                            'email_address' => $order->fields['customers_email_address']);
+                            'email_address' => $order->fields['customers_email_address'],
+    );
 
     $this->delivery = array('name' => $order->fields['delivery_name'],
                             'company' => $order->fields['delivery_company'],
@@ -130,7 +133,8 @@ class order extends base {
                             'postcode' => $order->fields['delivery_postcode'],
                             'state' => $order->fields['delivery_state'],
                             'country' => $order->fields['delivery_country'],
-                            'format_id' => $order->fields['delivery_address_format_id']);
+                            'format_id' => $order->fields['delivery_address_format_id'],
+    );
 
     if (($order->fields['shipping_module_code'] == 'storepickup') ||
         (empty($this->delivery['name']) && empty($this->delivery['street_address']))) {
@@ -145,7 +149,8 @@ class order extends base {
                            'postcode' => $order->fields['billing_postcode'],
                            'state' => $order->fields['billing_state'],
                            'country' => $order->fields['billing_country'],
-                           'format_id' => $order->fields['billing_address_format_id']);
+                           'format_id' => $order->fields['billing_address_format_id'],
+    );
 
     $index = 0;
     $orders_products_query = "SELECT *
@@ -202,7 +207,7 @@ class order extends base {
 
       $subindex = 0;
       $attributes_query = "SELECT products_options_id, products_options_values_id, products_options, products_options_values,
-                           options_values_price, price_prefix, product_attribute_is_free 
+                           options_values_price, price_prefix, product_attribute_is_free
                            FROM " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
                            WHERE orders_id = " . (int)$this->orderId . "
                            AND orders_products_id = " . (int)$orders_products->fields['orders_products_id'] . "
@@ -210,6 +215,7 @@ class order extends base {
 
       $attributes = $db->Execute($attributes_query);
       if ($attributes->RecordCount()) {
+        $this->products[$index]['attributes'] = [];
         while (!$attributes->EOF) {
           $this->products[$index]['attributes'][$subindex] = array(
               'option' => $attributes->fields['products_options'],
@@ -234,6 +240,8 @@ class order extends base {
       $orders_products->MoveNext();
     }
 
+    $this->statuses = $this->getStatusHistory($this->orderId);
+
     $this->notify('NOTIFY_ORDER_AFTER_QUERY', IS_ADMIN_FLAG, $this->orderId);
 
     /**
@@ -242,7 +250,40 @@ class order extends base {
     if (IS_ADMIN_FLAG === true) {
         $this->notify('ORDER_QUERY_ADMIN_COMPLETE', array('orders_id' => $this->orderId));
     }
+  }
 
+  function getStatusHistory($order_id, $language_id = null)
+  {
+      global $db;
+
+      if (empty($language_id)) {
+// @TODO - provide lookup in language class
+//          if (!empty($this->info['language_code'])) {
+//              global $lng;
+//              $language_id = $lng->getLanguageIdFromCode($this->info['language_code']);
+//          }
+          if (empty($language_id)) {
+              $language_id = $_SESSION['languages_id'];
+          }
+      }
+
+      $sql = "SELECT os.orders_status_name, osh.*
+                FROM   " . TABLE_ORDERS_STATUS . " os
+                LEFT JOIN " . TABLE_ORDERS_STATUS_HISTORY . " osh USING (orders_status_id)
+                WHERE osh.orders_id = :ordersID
+                AND os.language_id = :languageID
+                AND osh.customer_notified >= 0
+                ORDER BY osh.date_added";
+
+      $sql = $db->bindVars($sql, ':ordersID', $order_id, 'integer');
+      $sql = $db->bindVars($sql, ':languageID', $language_id, 'integer');
+      $results = $db->Execute($sql);
+
+      $statusArray = [];
+      foreach ($results as $result) {
+          $statusArray[] = $result;
+      }
+      return $statusArray;
   }
 
   function cart() {
@@ -361,7 +402,8 @@ class order extends base {
                               'country' => array('id' => $customer_address->fields['countries_id'], 'title' => $customer_address->fields['countries_name'], 'iso_code_2' => $customer_address->fields['countries_iso_code_2'], 'iso_code_3' => $customer_address->fields['countries_iso_code_3']),
                               'format_id' => (int)$customer_address->fields['address_format_id'],
                               'telephone' => $customer_address->fields['customers_telephone'],
-                              'email_address' => $customer_address->fields['customers_email_address']);
+                              'email_address' => $customer_address->fields['customers_email_address'],
+      );
     }
 
     if ($this->content_type == 'virtual') {
@@ -382,7 +424,7 @@ class order extends base {
             'iso_code_3' => ''
         ),
         'country_id' => 0,
-        'format_id' => 0
+        'format_id' => 0,
       );
     } elseif ($shipping_address->RecordCount() > 0) {
       $this->delivery = array('firstname' => $shipping_address->fields['entry_firstname'],
@@ -397,7 +439,8 @@ class order extends base {
                               'zone_id' => $shipping_address->fields['entry_zone_id'],
                               'country' => array('id' => $shipping_address->fields['countries_id'], 'title' => $shipping_address->fields['countries_name'], 'iso_code_2' => $shipping_address->fields['countries_iso_code_2'], 'iso_code_3' => $shipping_address->fields['countries_iso_code_3']),
                               'country_id' => $shipping_address->fields['entry_country_id'],
-                              'format_id' => (int)$shipping_address->fields['address_format_id']);
+                              'format_id' => (int)$shipping_address->fields['address_format_id'],
+      );
     }
 
     if ($billing_address->RecordCount() > 0) {
@@ -413,7 +456,8 @@ class order extends base {
                              'zone_id' => $billing_address->fields['entry_zone_id'],
                              'country' => array('id' => $billing_address->fields['countries_id'], 'title' => $billing_address->fields['countries_name'], 'iso_code_2' => $billing_address->fields['countries_iso_code_2'], 'iso_code_3' => $billing_address->fields['countries_iso_code_3']),
                              'country_id' => $billing_address->fields['entry_country_id'],
-                             'format_id' => (int)$billing_address->fields['address_format_id']);
+                             'format_id' => (int)$billing_address->fields['address_format_id'],
+      );
     }
 
     list($taxCountryId, $taxZoneId) = $this->determineTaxAddressZones($billto, $sendto);
@@ -453,7 +497,7 @@ class order extends base {
 
       $this->notify('NOTIFY_ORDER_CART_ADD_PRODUCT_LIST', array('index'=>$index, 'products'=>$products[$i]));
 
-      if ($products[$i]['attributes']) {
+      if (!empty($products[$i]['attributes'])) {
         $subindex = 0;
         foreach ($products[$i]['attributes'] as $option => $value) {
 
@@ -802,7 +846,7 @@ class order extends base {
           // Will work with only one option for downloadable products
           // otherwise, we have to build the query dynamically with a loop
           // NOTE: Need the (int) cast on the option_id, since checkbox-type attributes' are formatted like '46_chk887'.
-          if (!empty($this->products[$i]['attributes']) && is_array($this->products[$i]['attributes'])) {
+          if (!empty($this->products[$i]['attributes'])) {
             $products_attributes = $this->products[$i]['attributes'];
             $stock_query_raw .= " AND pa.options_id = " . (int)$products_attributes[0]['option_id'] . " AND pa.options_values_id = " . $products_attributes[0]['value_id'];
           }
@@ -1087,8 +1131,8 @@ class order extends base {
     //comments area
     $html_msg['ORDER_COMMENTS'] = '';
     if ($this->info['comments']) {
-      $email_order .= zen_db_output($this->info['comments']) . "\n\n";
-      $html_msg['ORDER_COMMENTS'] = nl2br(zen_db_output($this->info['comments']));
+      $email_order .= zen_output_string_protected($this->info['comments']) . "\n\n";
+      $html_msg['ORDER_COMMENTS'] = nl2br(zen_output_string_protected($this->info['comments']));
     }
 
     $this->notify('NOTIFY_ORDER_EMAIL_BEFORE_PRODUCTS', array(), $email_order, $html_msg);

@@ -39,9 +39,9 @@ systemChecks:
       checkPhpVersionMin:
         method: checkPhpVersion
         parameters:
-          version: 7.1.3
+          version: 7.3.0
           versionTest: ge
-          localErrorText: <?php echo sprintf(TEXT_ERROR_PHP_VERSION_MIN, '7.1.3') . PHP_EOL; ?>
+          localErrorText: <?php echo sprintf(TEXT_ERROR_PHP_VERSION_MIN, '7.3') . PHP_EOL; ?>
       checkPhpVersionMax:
         method: checkPhpVersion
         parameters:
@@ -56,7 +56,7 @@ systemChecks:
       checkPhpVersionRecommended:
         method: checkPhpVersion
         parameters:
-          version: 7.4.7
+          version: 7.4.0
           versionTest: ge
   checkZCversion:
     runLevel: always
@@ -73,6 +73,24 @@ systemChecks:
       checkExtension:
         parameters:
           extension: mysqli
+  pdomysqlExt:
+    runLevel: always
+    errorLevel: FAIL
+    criticalError: true
+    mainErrorText: <?php echo TEXT_ERROR_PDOMYSQL_SUPPORT .PHP_EOL; ?>
+    methods:
+      checkExtension:
+        parameters:
+          extension: pdo_mysql
+  pdosqliteExt:
+    runLevel: always
+    errorLevel: WARN
+    criticalError: true
+    mainErrorText: <?php echo TEXT_ERROR_PDOSQLITE_SUPPORT .PHP_EOL; ?>
+    methods:
+      checkExtension:
+        parameters:
+          extension: pdo_sqlite
   logFolder:
     runLevel: always
     errorLevel: FAIL
@@ -173,6 +191,22 @@ systemChecks:
     mainErrorText: <?php echo TEXT_ERROR_DB_CONNECTION_DEFAULT .PHP_EOL; ?>
     methods:
       checkDBConnection:
+  checkjson:
+    runLevel: always
+    errorLevel: FAIL
+    mainErrorText: <?php echo TEXT_ERROR_JSON .PHP_EOL; ?>
+    methods:
+      checkExtension:
+        parameters:
+          extension: json
+  checkfileinfo:
+    runLevel: always
+    errorLevel: WARN
+    mainErrorText: <?php echo TEXT_ERROR_FILEINFO .PHP_EOL; ?>
+    methods:
+      checkExtension:
+        parameters:
+          extension: fileinfo
   checkGD:
     runLevel: always
     errorLevel: WARN
@@ -245,6 +279,14 @@ systemChecks:
     errorLevel: WARN
     version: '1.5.8-dev'
     mainErrorText: <?php echo sprintf(TEXT_DB_VERSION_NOT_FOUND, 'v1.5.8-dev') . PHP_EOL; ?>
+    methods:
+      dbVersionChecker:
+        parameters:
+          - checkType: configKeyExists
+            keyName: PRODUCT_LISTING_COLUMNS_PER_ROW
+          - checkType: configValue
+            fieldName: CATEGORIES_TABS_STATUS
+            expectedResult: 'Category Header Menu ON/OFF'
 
   checkDBVersion157:
     runLevel: dbVersion
@@ -502,6 +544,5 @@ systemChecks:
     methods:
       dbVersionChecker:
         parameters:
-          - checkType: configValue
-            fieldName: CATEGORIES_TABS_STATUS
-            expectedResult: 'Categories-Tabs Menu ON/OFF'
+          - checkType: configKeyExists
+            keyName: CATEGORIES_TABS_STATUS

@@ -9,16 +9,13 @@
 
 namespace Zencart\FileSystem;
 
-use Zencart\Traits\Singleton;
+use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
 
-class FileSystem
+class FileSystem extends IlluminateFilesystem
 {
-    use Singleton;
-
-    protected $installedPlugins;
-
     public function loadFilesFromDirectory($rootDir, $fileRegx = '~^[^\._].*\.php$~i')
     {
+        if (!is_dir($rootDir)) return;
         if (!$dir = @dir($rootDir)) return;
         while ($file = $dir->read()) {
             if (preg_match($fileRegx, $file) > 0) {
@@ -30,6 +27,7 @@ class FileSystem
 
     public function listFilesFromDirectory($rootDir, $fileRegx = '~^[^\._].*\.php$~i')
     {
+        if (!is_dir($rootDir)) return[];
         if (!$dir = @dir($rootDir)) return [];
         $fileList = [];
         while ($file = $dir->read()) {
@@ -106,6 +104,7 @@ class FileSystem
     {
         $found = false;
         $filePattern = '/' . str_replace("/", "\/", $filePattern) . '$/';
+        if (!is_dir($fileDir)) return false;
         if ($mydir = @dir($fileDir)) {
             while ($file = $mydir->read()) {
                 if (preg_match($filePattern, $file)) {
@@ -116,37 +115,6 @@ class FileSystem
             $mydir->close();
         }
         return $found;
-    }
-
-    public function getPluginRelativeDirectory($pluginKey)
-    {
-        if (!isset($this->installedPlugins[$pluginKey])) {
-            return null;
-        }
-        $version = $this->installedPlugins[$pluginKey]['version'];
-        $relativePath = '/zc_plugins/' . $pluginKey . '/' . $version . '/';
-        return $relativePath;
-    }
-
-
-    public function getPluginAbsoluteDirectory($pluginKey)
-    {
-        if (!isset($this->installedPlugins[$pluginKey])) {
-            return null;
-        }
-        $version = $this->installedPlugins[$pluginKey]['version'];
-        $absolutePath = DIR_FS_CATALOG . 'zc_plugins/' . $pluginKey . '/' . $version . '/';
-        return $absolutePath;
-    }
-
-    public function setInstalledPlugins($installedPlugins)
-    {
-        $this->installedPlugins = $installedPlugins;
-    }
-
-    public function getInstalledPlugins()
-    {
-        return $this->installedPlugins;
     }
 
     public function setFileExtension($file, $extension = 'php')

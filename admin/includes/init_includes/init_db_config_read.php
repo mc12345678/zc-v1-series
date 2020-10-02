@@ -1,24 +1,24 @@
 <?php
 /**
  * @copyright Copyright 2003-2020 Zen Cart Development Team
- * @copyright Portions Copyright 2003 osCommerce
- * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: Scott C Wilson 2020 Apr 12 Modified in v1.5.7 $
+ * @license https://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id:  $
  */
 
-use App\Model\Configuration;
-use App\Model\ProjectVersion;
-use App\Model\ProductTypeLayout;
+use App\Models\Configuration;
+use App\Models\ProjectVersion;
+use App\Models\ProductTypeLayout;
 
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
 $config = new Configuration;
-$authkey = $config->where('configuration_key', 'GLOBAL_AUTH_KEY')->value('configuration_value');
-if (empty($authkey)) {
+$authkey = $config->where('configuration_key', 'GLOBAL_AUTH_KEY')->first();
+
+if ($authkey->configuration_value === '') {
     $hashable = hash('sha256', openssl_random_pseudo_bytes(64));
-    $config->update(['configuration_value' => $hashable])->where('configuration_key', 'GLOBAL_AUTH_KEY');
+    $authkey->update(['configuration_value' => $hashable]);
 }
 
 $config->loadConfigSettings();

@@ -31,7 +31,7 @@ if ((basename($PHP_SELF) != FILENAME_DEFINE_LANGUAGE . '.php') and (basename($PH
         $count = 0;
         for ($i = 0, $n = sizeof($languages); $i < $n; $i++) {
             $test_directory = DIR_WS_LANGUAGES . $languages[$i]['directory'];
-            $test_file = DIR_WS_LANGUAGES . $languages[$i]['directory'] . '.php';
+            $test_file = DIR_WS_LANGUAGES . 'lang.' . $languages[$i]['directory'] . '.php';
             if (file_exists($test_file) and file_exists($test_directory)) {
                 $count++;
                 $languages_array[] = array('id' => $languages[$i]['code'],
@@ -132,7 +132,7 @@ if (!$doVersionCheck || $versionCheckError) {
         $new_version = ERROR_CONTACTING_PROJECT_VERSION_SERVER . '<br>';
     }
     // display the "check for updated version" button.  The button link should be the current page and all params
-    $url = zen_href_link(basename($PHP_SELF), zen_get_all_get_params(array('vcheck'), 'SSL'));
+    $url = zen_href_link(basename($PHP_SELF), zen_get_all_get_params(array('vcheck')), 'SSL');
     $url .= (strpos($url, '?') !== false ? '&amp;' : '?') . 'vcheck=yes';
     if ($zv_db_patch_ok == true || $version_check_sysinfo == true) $new_version .= '<a href="' . $url . '" role="button" class="btn btn-link">' . TEXT_VERSION_CHECK_BUTTON . '</a>';
 }

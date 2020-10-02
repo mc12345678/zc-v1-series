@@ -82,23 +82,13 @@ if (isset($_POST['categories_update_id'])) {
 }
 
 if ($action == 'new_cat') {
-  $sql = "SELECT products_id
-          FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
-          WHERE categories_id = " . (int)$current_category_id . "
-          ORDER BY products_id";
-  $new_product_query = $db->Execute($sql);
-  $products_filter = (!$new_product_query->EOF) ? $new_product_query->fields['products_id'] : '';
+  $products_filter = zen_get_linked_products_for_category($current_category_id, $first_only = true);
   zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id));
 }
 
 // set categories and products if not set
 if ($products_filter == '' && !empty($current_category_id)) {
-  $sql = "SELECT *
-          FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
-          WHERE categories_id = " . (int)$current_category_id . "
-          ORDER BY products_id";
-  $new_product_query = $db->Execute($sql);
-  $products_filter = (!$new_product_query->EOF) ? $new_product_query->fields['products_id'] : '';
+  $products_filter = zen_get_linked_products_for_category($current_category_id, $first_only = true);
   if ($products_filter != '') {
     zen_redirect(zen_href_link(FILENAME_ATTRIBUTES_CONTROLLER, 'products_filter=' . $products_filter . '&current_category_id=' . $current_category_id));
   }
@@ -106,12 +96,7 @@ if ($products_filter == '' && !empty($current_category_id)) {
   if ($products_filter == '' && empty($current_category_id)) {
     $reset_categories_id = zen_get_category_tree('', '', '0', '', '', true);
     $current_category_id = $reset_categories_id[0]['id'];
-    $sql = "SELECT *
-            FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
-            WHERE categories_id = " . (int)$current_category_id . "
-            ORDER BY products_id";
-    $new_product_query = $db->Execute($sql);
-    $products_filter = (!$new_product_query->EOF) ? $new_product_query->fields['products_id'] : '';
+    $products_filter = zen_get_linked_products_for_category($current_category_id, $first_only = true);
     $_GET['products_filter'] = $products_filter;
   }
 }
@@ -197,7 +182,7 @@ if (zen_not_null($action)) {
 // update by product
     case 'update_attribute_sort':
       if (isset($_POST['confirm']) && $_POST['confirm'] == 'y') {
-        if (!zen_has_product_attributes($products_filter, 'false')) {
+        if (!zen_has_product_attributes($products_filter, false)) {
           $messageStack->add_session(SUCCESS_PRODUCT_UPDATE_SORT_NONE . $products_filter . ' ' . zen_get_products_name($products_filter, $_SESSION['languages_id']), 'error');
         } else {
           zen_update_attributes_products_option_values_sort_order($products_filter);
@@ -580,11 +565,9 @@ if (zen_not_null($action)) {
       if ($_POST['categories_update_id'] == '') {
         $messageStack->add_session(WARNING_PRODUCT_COPY_TO_CATEGORY_NONE . ' ID#' . $_POST['products_filter'], 'warning');
       } else {
-        $copy_to_category = $db->Execute("SELECT products_id
-                                          FROM " . TABLE_PRODUCTS_TO_CATEGORIES . "
-                                          WHERE categories_id = " . (int)$_POST['categories_update_id']);
+        $copy_to_category = zen_get_linked_products_for_category((int)$_POST['categories_update_id']);
         foreach ($copy_to_category as $item) {
-          zen_copy_products_attributes($_POST['products_filter'], $item['products_id']);
+          zen_copy_products_attributes($_POST['products_filter'], $item);
         }
       }
       $_GET['action'] = '';
@@ -601,21 +584,6 @@ $products_options_type_array = $db->Execute("SELECT products_options_types_id, p
                                              ORDER BY products_options_types_id");
 foreach ($products_options_type_array as $products_options_type) {
   $products_options_types_list[$products_options_type['products_options_types_id']] = $products_options_type['products_options_types_name'];
-}
-
-//CLR 030312 add function to draw pulldown list of option types
-// Draw a pulldown for Option Types
-//iii 031103 modified to use results of database option type query from above
-function draw_optiontype_pulldown($name, $default = '')
-{
-  global $products_options_types_list;
-  $values = [];
-  foreach ($products_options_types_list as $id => $text) {
-    $values[] = [
-      'id' => $id,
-      'text' => $text];
-  }
-  return zen_draw_pull_down_menu($name, $values, $default);
 }
 
 //CLR 030312 add function to translate type_id to name
@@ -715,7 +683,7 @@ function zen_js_option_values_list($selectedName, $fieldName)
                   <li role="presentation"><a role="menuitem" href="<?php echo zen_href_link(FILENAME_PRODUCTS_PRICE_MANAGER, '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id); ?>"><?php echo IMAGE_PRODUCTS_PRICE_MANAGER; ?></a></li>
                 <?php } ?>
                 <?php
-                if (zen_has_product_attributes($products_filter, 'false')) {
+                if (zen_has_product_attributes($products_filter, false)) {
                   ?>
                   <li role="presentation">
                     <?php echo zen_draw_form('update_sort', FILENAME_ATTRIBUTES_CONTROLLER, 'action=update_attribute_sort' . '&products_filter=' . $products_filter . '&current_category_id=' . $current_category_id); ?>
@@ -1492,7 +1460,7 @@ function zen_js_option_values_list($selectedName, $fieldName)
 // calculate current total attribute price
 // $attributes_values
 
-                  $attributes_price_final = zen_get_attributes_price_final($attributes_value['products_attributes_id'], 1, $attributes_values, 'false');
+                  $attributes_price_final = zen_get_attributes_price_final($attributes_value['products_attributes_id'], 1, $attributes_values, false);
                   $attributes_price_final_value = $attributes_price_final;
                   $attributes_price_final = $currencies->display_price($attributes_price_final, zen_get_tax_rate($product_check->fields['products_tax_class_id']), 1);
                   $attributes_price_final_onetime = zen_get_attributes_price_final_onetime($attributes_value['products_attributes_id'], 1, $attributes_values);
@@ -1590,7 +1558,7 @@ function zen_js_option_values_list($selectedName, $fieldName)
                     <?php
                     $new_attributes_price = '';
                     if ($attributes_value['attributes_discounted']) {
-                      $new_attributes_price = zen_get_attributes_price_final($attributes_value['products_attributes_id'], 1, '', 'false');
+                      $new_attributes_price = zen_get_attributes_price_final($attributes_value['products_attributes_id'], 1, '', false);
                       $new_attributes_price2 = zen_get_discount_calc($products_filter, true, $new_attributes_price);
                       if ($new_attributes_price != $attributes_price_final_value) {
                         $new_attributes_price = '|' . $currencies->display_price($new_attributes_price2, zen_get_tax_rate($product_check->fields['products_tax_class_id']), 1);

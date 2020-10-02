@@ -3,7 +3,7 @@
  * @copyright Copyright 2003-2020 Zen Cart Development Team
  * @copyright Portions Copyright 2003 osCommerce
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
- * @version $Id: DrByte 2020 May 21 Modified in v1.5.7 $
+ * @version $Id: DrByte 2020 May 21 Modified in v1.5.8 $
  */
 
 // FOLLOWING WERE moved to meta_tags.php
@@ -65,6 +65,7 @@
 
 // manufacturers box text in sideboxes/manufacturers.php
   define('BOX_HEADING_MANUFACTURERS', 'Manufacturers');
+  define('BOX_HEADING_BRANDS', 'Shop by Brand');
 
 // whats_new box text in sideboxes/whats_new.php
   define('BOX_HEADING_WHATS_NEW', 'New Products');
@@ -335,6 +336,7 @@ define('ARIA_PAGINATION_','');
   define('SUCCESS_ADDED_TO_CART_PRODUCT', 'Successfully added Product to the cart ...');
 // only for where multiple add to cart is used:
   define('SUCCESS_ADDED_TO_CART_PRODUCTS', 'Successfully added selected Product(s) to the cart ...');
+  define('FAILED_TO_ADD_UNAVAILABLE_PRODUCTS', 'The selected Product(s) are not currently available for purchase...');
 
   define('TEXT_PRODUCT_WEIGHT_UNIT','lbs');
 
@@ -580,7 +582,7 @@ define('ARIA_PAGINATION_','');
   define('TEXT_PRODUCTS_LISTING_ALPHA_SORTER', '');
   define('TEXT_PRODUCTS_LISTING_ALPHA_SORTER_NAMES', 'Items starting with ...');
   define('TEXT_PRODUCTS_LISTING_ALPHA_SORTER_NAMES_RESET', '-- Reset --');
-  
+
 // The following message, with the associated severity, is displayed in the storefront header when an admin has logged into
 // a customer's account.
 
@@ -601,10 +603,10 @@ define('TEXT_OPTION_DIVIDER', '&nbsp;-&nbsp;');
 
 ///////////////////////////////////////////////////////////
 
-  $file_list = [FILENAME_EMAIL_EXTRAS, FILENAME_HEADER, FILENAME_BUTTON_NAMES, FILENAME_ICON_NAMES, FILENAME_OTHER_IMAGES_NAMES, FILENAME_CREDIT_CARDS, FILENAME_WHOS_ONLINE, FILENAME_META_TAGS];
-  foreach ($file_list as $file) { 
-    $file = str_replace(".php","",$file); 
-    require_once(zen_get_file_directory(DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'] . "/", $file . '.php', 'false'));
-  }
+//  $file_list = [FILENAME_EMAIL_EXTRAS, FILENAME_HEADER, FILENAME_BUTTON_NAMES, FILENAME_ICON_NAMES, FILENAME_OTHER_IMAGES_NAMES, FILENAME_CREDIT_CARDS, FILENAME_WHOS_ONLINE, FILENAME_META_TAGS];
+//  foreach ($file_list as $file) {
+//    $file = str_replace(".php","",$file);
+//    require_once(zen_get_file_directory(DIR_FS_CATALOG . DIR_WS_LANGUAGES . $_SESSION['language'] . "/", $file . '.php', 'false'));
+//  }
 
 // END OF EXTERNAL LANGUAGE LINKS

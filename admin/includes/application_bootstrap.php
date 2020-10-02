@@ -8,6 +8,7 @@
 
 use Zencart\FileSystem\FileSystem;
 use Zencart\PluginManager\PluginManager;
+use Zencart\PageLoader\PageLoader;
 
 /**
  * boolean if true the autoloader scripts will be parsed and their output shown. For debugging purposes only.
@@ -65,9 +66,9 @@ if (file_exists('includes/configure.php')) {
  * in php.ini. Otherwise we respect the php.ini setting
  *
  */
-if (defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
+if (DEBUG_AUTOLOAD || defined('STRICT_ERROR_REPORTING') && STRICT_ERROR_REPORTING == true) {
     @ini_set('display_errors', TRUE);
-    error_reporting(E_ALL);
+    error_reporting(defined('STRICT_ERROR_REPORTING_LEVEL') ? STRICT_ERROR_REPORTING_LEVEL : E_ALL);
 } else {
     error_reporting(0);
 }
@@ -147,7 +148,7 @@ define('DIR_WS_TEMPLATES', DIR_WS_INCLUDES . 'templates/');
  * psr-4 autoloading
  */
 require DIR_FS_CATALOG . DIR_WS_CLASSES . 'vendors/AuraAutoload/src/Loader.php';
-require DIR_FS_CATALOG . 'app/vendor/autoload.php';
+require DIR_FS_CATALOG . 'laravel/vendor/autoload.php';
 $psr4Autoloader = new \Aura\Autoload\Loader;
 $psr4Autoloader->register();
 require(DIR_FS_CATALOG . 'includes/psr4Autoload.php');
@@ -158,11 +159,13 @@ require 'includes/init_includes/init_file_db_names.php';
 require 'includes/init_includes/init_database.php';
 require DIR_FS_CATALOG . 'includes/illuminate_bootstrap.php';
 
-$pluginManager = new PluginManager($db);
-$installedPlugins = $pluginManager->getInstalledPlugins();
+$installedPlugins = $laravelApp->make('installedPlugins');
+$pluginManager = new PluginManager(new App\Models\PluginControl, new App\Models\PluginControlVersion);
+$pageLoader = PageLoader::getInstance();
+$pageLoader->init($installedPlugins, $PHP_SELF, new FileSystem);
 
-$fs = FileSystem::getInstance();
-$fs->setInstalledPlugins($installedPlugins);
+$fs = new FileSystem;
+$fs->loadFilesFromPluginsDirectory($installedPlugins, 'admin/includes/extra_configures', '~^[^\._].*\.php$~i');
 $fs->loadFilesFromPluginsDirectory($installedPlugins, 'admin/includes/extra_datafiles', '~^[^\._].*\.php$~i');
 
 foreach ($installedPlugins as $plugin) {

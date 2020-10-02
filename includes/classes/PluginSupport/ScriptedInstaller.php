@@ -27,6 +27,12 @@ class ScriptedInstaller
         return $uninstalled;
     }
 
+    public function doUpgrade()
+    {
+        $upgraded = $this->executeUpgrade();
+        return $upgraded;
+    }
+
     protected function executeInstall()
     {
         return true;
@@ -37,12 +43,17 @@ class ScriptedInstaller
         return true;
     }
 
+    protected function executeUpgrade()
+    {
+        return true;
+    }
+
     protected function executeInstallerSql($sql)
     {
         $this->dbConn->dieOnErrors = false;
         $this->dbConn->Execute($sql);
         if ($this->dbConn->error_number !== 0) {
-            $this->errorContainer->addError(0, $this->dbConn->error_text, false, PLUGIN_INSTALL_SQL_FAILURE);
+            $this->errorContainer->addError(0, $this->dbConn->error_text, true, PLUGIN_INSTALL_SQL_FAILURE);
             return false;
         }
         $this->dbConn->dieOnErrors = true;

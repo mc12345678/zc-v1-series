@@ -106,7 +106,7 @@ function zen_display_files($include_root = false, $filetypesincluded = 1) {
       $root_array[] = DIR_FS_CATALOG . 'page_not_found.php';
     }
 
-    $root_array[] = DIR_FS_CATALOG . 'nddbc.html';
+    $root_array[] = DIR_FS_CATALOG . FILENAME_DATABASE_TEMPORARILY_DOWN; 
     $new_array = array_merge($root_array, $original_array);
     $directory_array = $new_array;
   }
@@ -174,10 +174,10 @@ function zen_display_files($include_root = false, $filetypesincluded = 1) {
         $cnt_lines++;
 
         // determine correct search pattern rule
-        // uses '#' as regex delimeter
+        // uses '#' as regex delimiter
         $search_pattern = preg_quote($configuration_key_lookup, '#');
         if (isset($_GET['action']) && $_GET['action'] == 'locate_all_files' && isset($_GET['m']) && $_GET['m'] != '') {
-          // escape the delimeter character:
+          // escape the delimiter character:
           $search_pattern = str_replace('#', '\#', $configuration_key_lookup);
         }
 

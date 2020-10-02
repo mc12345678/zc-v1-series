@@ -247,30 +247,47 @@ function zen_image_submit($image, $alt = '', $parameters = '')
     return $form;
   }
 
-////
-// Output a form input field
-  function zen_draw_input_field($name, $value = '~*~*#', $parameters = '', $required = false, $type = 'text', $reinsert_value = true) {
-    $type = zen_output_string($type);
-    if ($type === 'price') $type = 'number" step="0.01';
-
-    $field = '<input type="' . $type . '" name="' . zen_output_string($name) . '"';
-
-    if ( $value == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true) ) {
-      $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
-    } elseif ($value != '~*~*#' && zen_not_null($value)) {
-      $field .= ' value="' . zen_output_string($value) . '"';
-    }
-
-    if (zen_not_null($parameters)) $field .= ' ' . $parameters;
-
-    if ($required && strpos($parameters, 'required') === false) {
-        $field .= ' required';
-    }
-
-    $field .= ' />';
-
-    return $field;
+  /**
+ *
+ * Output a form input field
+ * @param string $name field name
+ * @param string $value field value
+ * @param string $parameters extra parameters like classes or id
+ * @param boolean $required field is required
+ * @param string $type filed type
+ * @param boolean $reinsert_value
+ * @return string
+ */
+function zen_draw_input_field($name, $value = '~*~*#', $parameters = '', $required = false, $type = 'text', $reinsert_value = true)
+{
+  $type = zen_output_string($type);
+  if ($type === 'price') {
+    $type = 'number" step="0.01';
   }
+  $field = ($required ? '<div class="input-group">' . PHP_EOL : '');
+  $field .= '<input type="' . $type . '" name="' . zen_output_string($name) . '"';
+
+  if ($value == '~*~*#' && (isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) && ($reinsert_value == true)) {
+    $field .= ' value="' . zen_output_string(stripslashes($GLOBALS[$name])) . '"';
+  } elseif ($value != '~*~*#' && zen_not_null($value)) {
+    $field .= ' value="' . zen_output_string($value) . '"';
+  }
+
+  if (zen_not_null($parameters)) {
+    $field .= ' ' . $parameters;
+  }
+
+  if ($required && strpos($parameters, 'required') === false) {
+    $field .= ' required';
+  }
+
+  $field .= '>' . PHP_EOL;
+  if ($required) {
+    $field .= '<span class="input-group-addon alert-danger">' . '*' . '</span>' . PHP_EOL;
+    $field .= '</div>' . PHP_EOL;
+  }
+  return $field;
+}
 
 ////
 // Output a form password field
@@ -371,35 +388,41 @@ function zen_image_submit($image, $alt = '', $parameters = '')
  * @param boolean $required required
  * @return string
  */
-  function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false) {
-    $field = '<select rel="dropdown" name="' . zen_output_string($name) . '"';
+function zen_draw_pull_down_menu($name, $values, $default = '', $parameters = '', $required = false)
+{
+  $field = ($required ? '<div class="input-group">' . PHP_EOL : '');
+  $field .= '<select rel="dropdown" name="' . zen_output_string($name) . '"';
 
-    if (zen_not_null($parameters)) {
-      $field .= ' ' . $parameters;
-    }
-
-    if ($required && strpos($parameters, 'required') === false) {
-          $field .= ' required';
-    }
-
-    $field .= '>' . "\n";
-
-    if (empty($default) && isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
-      $default = stripslashes($GLOBALS[$name]);
-    }
-
-    foreach ($values as $value) {
-      $field .= '<option value="' . zen_output_string($value['id']) . '"';
-      if ($default == $value['id']) {
-        $field .= ' selected="selected"';
-      }
-
-      $field .= '>' . zen_output_string($value['text'], array('"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;')) . '</option>' . "\n";
-    }
-    $field .= '</select>' . "\n";
-
-    return $field;
+  if (zen_not_null($parameters)) {
+    $field .= ' ' . $parameters;
   }
+
+  if ($required && strpos($parameters, 'required') === false) {
+    $field .= ' required';
+  }
+
+  $field .= '>' . "\n";
+
+  if (empty($default) && isset($GLOBALS[$name]) && is_string($GLOBALS[$name])) {
+    $default = stripslashes($GLOBALS[$name]);
+  }
+
+  foreach ($values as $value) {
+    $field .= '<option value="' . zen_output_string($value['id']) . '"';
+    if ($default == $value['id']) {
+      $field .= ' selected="selected"';
+    }
+
+    $field .= '>' . zen_output_string($value['text'], array('"' => '&quot;', '\'' => '&#039;', '<' => '&lt;', '>' => '&gt;')) . '</option>' . "\n";
+  }
+  $field .= '</select>' . "\n";
+  if ($required) {
+    $field .= '<span class="input-group-addon alert-danger">' . '*' . '</span>' . PHP_EOL;
+    $field .= '</div>' . PHP_EOL;
+  }
+
+  return $field;
+}
 
 ////
 // Hide form elements
@@ -422,4 +445,53 @@ function zen_draw_label($text, $for, $parameters = '')
 {
     $label = '<label for="' . $for . '"' . (!empty($parameters) ? ' ' . $parameters : '') . '>' . $text . '</label>';
     return $label;
+}
+
+
+/**
+ * Output a day/month/year dropdown selector
+ * @param string $fieldname_prefix
+ * @param string $default_date
+ * @return string
+ */
+function zen_draw_date_selector($fieldname_prefix, $default_date='') {
+    $month_array = array();
+    $month_array[1] =_JANUARY;
+    $month_array[2] =_FEBRUARY;
+    $month_array[3] =_MARCH;
+    $month_array[4] =_APRIL;
+    $month_array[5] =_MAY;
+    $month_array[6] =_JUNE;
+    $month_array[7] =_JULY;
+    $month_array[8] =_AUGUST;
+    $month_array[9] =_SEPTEMBER;
+    $month_array[10] =_OCTOBER;
+    $month_array[11] =_NOVEMBER;
+    $month_array[12] =_DECEMBER;
+    $usedate = getdate($default_date);
+    $day = $usedate['mday'];
+    $month = $usedate['mon'];
+    $year = $usedate['year'];
+    $date_selector = '<select name="'. $fieldname_prefix .'_day">';
+    for ($i=1;$i<32;$i++){
+        $date_selector .= '<option value="' . $i . '"';
+        if ($i==$day) $date_selector .= ' selected';
+        $date_selector .= '>' . $i . '</option>';
+    }
+    $date_selector .= '</select>';
+    $date_selector .= '<select name="'. $fieldname_prefix .'_month">';
+    for ($i=1;$i<13;$i++){
+        $date_selector .= '<option value="' . $i . '"';
+        if ($i==$month) $date_selector .= ' selected';
+        $date_selector .= '>' . $month_array[$i] . '</option>';
+    }
+    $date_selector .= '</select>';
+    $date_selector .= '<select name="'. $fieldname_prefix .'_year">';
+    for ($i = date('Y') - 5, $j = date('Y') + 11; $i < $j; $i++) {
+        $date_selector .= '<option value="' . $i . '"';
+        if ($i==$year) $date_selector .= ' selected';
+        $date_selector .= '>' . $i . '</option>';
+    }
+    $date_selector .= '</select>';
+    return $date_selector;
 }

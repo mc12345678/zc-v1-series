@@ -76,6 +76,8 @@ UPDATE configuration SET configuration_description = 'Number of products to show
 UPDATE configuration SET configuration_description = 'Number of products to show per page when viewing New Products' WHERE configuration_key = 'MAX_DISPLAY_PRODUCTS_NEW';
 UPDATE configuration SET configuration_description = 'Number of products to show per page when viewing Featured Products' WHERE configuration_key = 'MAX_DISPLAY_PRODUCTS_FEATURED_PRODUCTS';
 
+UPDATE configuration SET configuration_description = 'Should the links to My Account show up on the site-map?<br />Note: Spiders will try to index this page, and likely should not be sent to secure pages, since there is no benefit in indexing a login page.<br /><br />Default: No' WHERE configuration_key = 'SHOW_ACCOUNT_LINKS_ON_SITE_MAP';
+
 UPDATE configuration SET configuration_title = 'New Products Centerbox', configuration_description = 'Number of products to display in the New Products centerbox' WHERE configuration_key = 'MAX_DISPLAY_NEW_PRODUCTS';
 UPDATE configuration SET configuration_title = 'Products on Special Centerbox', configuration_description = 'Number of products to display in the Products on Special centerbox' WHERE configuration_key = 'MAX_DISPLAY_SPECIAL_PRODUCTS_INDEX';
 UPDATE configuration SET configuration_title = 'Upcoming Products Centerbox', configuration_description = 'Number of products to display in the Upcoming Products centerbox' WHERE configuration_key = 'MAX_DISPLAY_UPCOMING_PRODUCTS';

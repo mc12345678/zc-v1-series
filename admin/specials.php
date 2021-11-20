@@ -425,7 +425,7 @@ if (zen_not_null($action)) {
                         $old_page = $_GET['page'];
                         $check_page = $db->Execute($specials_query_raw);
                         if ($check_page->RecordCount() > MAX_DISPLAY_SEARCH_RESULTS) {
-                            $check_count = 1;
+                            $check_count = 0;
                             foreach ($check_page as $item) {
                                 if ((int)$item['specials_id'] === (int)$_GET['sID']) {
                                     break;

@@ -351,7 +351,7 @@ if (zen_not_null($action)) {
                         $old_page = $_GET['page'];
                         $check_page = $db->Execute($featured_query_raw);
                         if ($check_page->RecordCount() > MAX_DISPLAY_SEARCH_RESULTS_FEATURED_ADMIN) {
-                            $check_count = 1;
+                            $check_count = 0;
                             foreach ($check_page as $item) {
                                 if ((int)$item['featured_id'] === (int)$_GET['fID']) {
                                     break;

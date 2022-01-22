@@ -2,7 +2,9 @@
 
 namespace Illuminate\Contracts\Support;
 
-interface MessageBag extends Arrayable
+use Countable;
+
+interface MessageBag extends Arrayable, Countable
 {
     /**
      * Get the keys present in the message bag.

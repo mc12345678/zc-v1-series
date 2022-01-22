@@ -15,6 +15,7 @@ use Illuminate\Support\HigherOrderWhenProxy;
 use JsonSerializable;
 use Symfony\Component\VarDumper\VarDumper;
 use Traversable;
+use UnexpectedValueException;
 
 /**
  * @property-read HigherOrderCollectionProxy $average
@@ -45,6 +46,13 @@ use Traversable;
  */
 trait EnumeratesValues
 {
+    /**
+     * Indicates that the object's string representation should be escaped when __toString is invoked.
+     *
+     * @var bool
+     */
+    protected $escapeWhenCastingToString = false;
+
     /**
      * The methods that can be proxied.
      *
@@ -714,6 +722,22 @@ trait EnumeratesValues
     }
 
     /**
+     * Pass the collection through a series of callable pipes and return the result.
+     *
+     * @param  array<callable>  $pipes
+     * @return mixed
+     */
+    public function pipeThrough($pipes)
+    {
+        return static::make($pipes)->reduce(
+            function ($carry, $pipe) {
+                return $pipe($carry);
+            },
+            $this,
+        );
+    }
+
+    /**
      * Pass the collection to the given callback and then return it.
      *
      * @param  callable  $callback
@@ -730,7 +754,7 @@ trait EnumeratesValues
      * Reduce the collection to a single value.
      *
      * @param  callable  $callback
-     * @param  mixed $initial
+     * @param  mixed  $initial
      * @return mixed
      */
     public function reduce(callable $callback, $initial = null)
@@ -745,21 +769,58 @@ trait EnumeratesValues
     }
 
     /**
-     * Reduce an associative collection to a single value.
+     * Reduce the collection to multiple aggregate values.
      *
      * @param  callable  $callback
-     * @param  mixed $initial
-     * @return mixed
+     * @param  mixed  ...$initial
+     * @return array
+     *
+     * @deprecated Use "reduceSpread" instead
+     *
+     * @throws \UnexpectedValueException
      */
-    public function reduceWithKeys(callable $callback, $initial = null)
+    public function reduceMany(callable $callback, ...$initial)
+    {
+        return $this->reduceSpread($callback, ...$initial);
+    }
+
+    /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param  callable  $callback
+     * @param  mixed  ...$initial
+     * @return array
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function reduceSpread(callable $callback, ...$initial)
     {
         $result = $initial;
 
         foreach ($this as $key => $value) {
-            $result = $callback($result, $value, $key);
+            $result = call_user_func_array($callback, array_merge($result, [$value, $key]));
+
+            if (! is_array($result)) {
+                throw new UnexpectedValueException(sprintf(
+                    "%s::reduceMany expects reducer to return an array, but got a '%s' instead.",
+                    class_basename(static::class), gettype($result)
+                ));
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * Reduce an associative collection to a single value.
+     *
+     * @param  callable  $callback
+     * @param  mixed  $initial
+     * @return mixed
+     */
+    public function reduceWithKeys(callable $callback, $initial = null)
+    {
+        return $this->reduce($callback, $initial);
     }
 
     /**
@@ -839,6 +900,7 @@ trait EnumeratesValues
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return array_map(function ($value) {
@@ -883,7 +945,22 @@ trait EnumeratesValues
      */
     public function __toString()
     {
-        return $this->toJson();
+        return $this->escapeWhenCastingToString
+                    ? e($this->toJson())
+                    : $this->toJson();
+    }
+
+    /**
+     * Indicate that the model's string representation should be escaped when __toString is invoked.
+     *
+     * @param  bool  $escape
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true)
+    {
+        $this->escapeWhenCastingToString = $escape;
+
+        return $this;
     }
 
     /**

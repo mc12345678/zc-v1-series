@@ -383,7 +383,7 @@ if (DISPLAY_PRICE_WITH_TAX == 'true') {
 $order_str = '';
 
 // Notifier Point
-$zco_notifier->notify('NOTIFY_SEARCH_WHERE_STRING');
+$zco_notifier->notify('NOTIFY_SEARCH_WHERE_STRING', ['keywords'=>$keywords,], $where_str);
 
 
 if ((DISPLAY_PRICE_WITH_TAX == 'true') && ((isset($_GET['pfrom']) && zen_not_null($_GET['pfrom'])) || (isset($_GET['pto']) && zen_not_null($_GET['pto'])))) {

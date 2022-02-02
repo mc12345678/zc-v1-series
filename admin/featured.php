@@ -374,7 +374,6 @@ if (!empty($action)) {
                 // Split Page
                 // reset page when page is unknown
                 if ((empty($_GET['page']) || $_GET['page'] == '1') && !empty($_GET['fID'])) {
-                    $old_page = $_GET['page'];
                     $check_page = $db->Execute($featured_query_raw);
                     if ($check_page->RecordCount() > MAX_DISPLAY_SEARCH_RESULTS_FEATURED_ADMIN) {
                         $check_count = 0;
@@ -385,7 +384,6 @@ if (!empty($action)) {
                             $check_count++;
                         }
                         $_GET['page'] = round((($check_count / MAX_DISPLAY_SEARCH_RESULTS_FEATURED_ADMIN) + (fmod_round($check_count, MAX_DISPLAY_SEARCH_RESULTS_FEATURED_ADMIN) !== 0 ? .5 : 0)));
-                        $page = $_GET['page'];
                     } else {
                         $_GET['page'] = 1;
                     }

@@ -43,52 +43,49 @@ class navigationHistory extends base
         $get_vars = $_GET;
         unset($get_vars['main_page']);
 
-        $set = 'true';
+//        $set = 'true'; Not needed because any 'false' condition is already internally addressed.
         for ($i = 0, $n = count($this->path); $i < $n; $i++) {
-            if (isset($_GET['main_page']) && $this->path[$i]['page'] === $_GET['main_page']) {
-                if (isset($cPath)) {
-                    if (!isset($this->path[$i]['get']['cPath'])) {
-                        continue;
-                    } else {
-                        if ($this->path[$i]['get']['cPath'] == $cPath) {
-                            array_splice($this->path, ($i+1));
-                            $set = 'false';
-                            break;
-                        } else {
-                            $old_cPath = explode('_', $this->path[$i]['get']['cPath']);
-                            $new_cPath = explode('_', $cPath);
+            if (!(isset($_GET['main_page']) && $this->path[$i]['page'] === $_GET['main_page'])) {
+                continue;
+            }
+                
+            if (!isset($cPath)) {
+                array_splice($this->path, ($i));
+//                $set = 'true'; // Not needed as is initially set to true, and where set to false it exits this method
+                break;
+            }
+            if (!isset($this->path[$i]['get']['cPath'])) {
+                continue;
+            }
+            if ($this->path[$i]['get']['cPath'] == $cPath) {
+                array_splice($this->path, ($i+1));
+//                $set = 'false'; // Not needed because action of this already "skips" setting.
+                return;
+            }
+            $old_cPath = explode('_', $this->path[$i]['get']['cPath']);
+            $new_cPath = explode('_', $cPath);
 
-                            $exit_loop = false;
-                            for ($j=0, $n2=sizeof($old_cPath); $j<$n2; $j++) {
-                                if ($old_cPath[$j] != $new_cPath[$j]) {
-                                    array_splice($this->path, ($i));
-                                    $set = 'true';
-                                    $exit_loop = true;
-                                    break;
-                                }
-                            }
-                            if ($exit_loop == true) {
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    array_splice($this->path, ($i));
-                    $set = 'true';
-                    break;
+            for ($j=0, $n2=sizeof($old_cPath); $j<$n2; $j++) {
+                if ($old_cPath[$j] == $new_cPath[$j]) {
+                    continue;
                 }
+                array_splice($this->path, ($i));
+//                $set = 'true'; // Not needed as is initially set to true, and where set to false it exits this method
+                break 2;
             }
         }
 
-        if ($set === 'true') {
-            $page = (isset($_GET['main_page'])) ? $_GET['main_page'] : FILENAME_DEFAULT;
-             $this->path[] = [
-                'page' => $page,
-                'mode' => $request_type,
-                'get' => $get_vars,
-                'post' => [] /*$_POST*/
-            ];
-        }
+//        if ($set !== 'true') {
+//            return;
+//        } // Not needed because above case of setting to false already bypasses this
+
+        $page = $_GET['main_page'] ?? FILENAME_DEFAULT;
+        $this->path[] = [
+            'page' => $page,
+            'mode' => $request_type,
+            'get' => $get_vars,
+            'post' => [] /*$_POST*/
+        ];
     }
 
     public function remove_current_page()
@@ -104,17 +101,18 @@ class navigationHistory extends base
         global $request_type;
         if (is_array($page)) {
             $this->snapshot = array_merge(['get' => [], 'post' => []], $page);
-        } else {
-            $get_vars = $_GET;
-            unset($get_vars['main_page']);
-            $page = (isset($_GET['main_page'])) ? $_GET['main_page'] : FILENAME_DEFAULT;
-            $this->snapshot = [
-                'page' => $page,
-                'mode' => $request_type,
-                'get' => $get_vars,
-                'post' => [] /*$_POST*/
-            ];
+            return;
         }
+
+        $get_vars = $_GET;
+        unset($get_vars['main_page']);
+        $page = $_GET['main_page'] ?? FILENAME_DEFAULT;
+        $this->snapshot = [
+            'page' => $page,
+            'mode' => $request_type,
+            'get' => $get_vars,
+            'post' => [] /*$_POST*/,
+        ];
     }
 
     public function clear_snapshot()
@@ -129,7 +127,7 @@ class navigationHistory extends base
             'page' => $this->path[$pos]['page'],
             'mode' => $this->path[$pos]['mode'],
             'get' => $this->path[$pos]['get'],
-            'post' => $this->path[$pos]['post']
+            'post' => $this->path[$pos]['post'],
         ];
     }
 

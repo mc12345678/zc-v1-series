@@ -449,22 +449,14 @@ function zen_copy_products_attributes($products_id_from, $products_id_to)
                 AND options_values_id=" . (int)$copy_from['options_values_id'];
         $check_duplicate = $db->Execute($sql);
 
+        
+        $update_attribute = false;
+        $add_attribute = true;
         if ($already_has_attributes == true) {
-            if ($check_duplicate->RecordCount() == 0) {
-                $update_attribute = false;
-                $add_attribute = true;
-            } else {
-                if ($check_duplicate->RecordCount() == 0) {
-                    $update_attribute = false;
-                    $add_attribute = true;
-                } else {
-                    $update_attribute = true;
-                    $add_attribute = false;
-                }
+            if ($check_duplicate->RecordCount() != 0) {
+                $update_attribute = true;
+                $add_attribute = false;
             }
-        } else {
-            $update_attribute = false;
-            $add_attribute = true;
         }
 
         if ($copy_attributes_duplicates_skipped == '1' and $check_duplicate->RecordCount() != 0) {

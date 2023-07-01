@@ -24,13 +24,15 @@ if (!isset($prev_next_list) || $prev_next_list == '') {
                           FROM " . TABLE_PRODUCTS . "
                           WHERE products_id = " . (int)$products_filter);
   $check_type = ($result->EOF) ? 0 : $result->fields['products_type'];
-  if (!defined('PRODUCT_INFO_PREVIOUS_NEXT_SORT')) define('PRODUCT_INFO_PREVIOUS_NEXT_SORT', zen_get_configuration_key_value_layout('PRODUCT_INFO_PREVIOUS_NEXT_SORT', $check_type));
+  if (!defined('PRODUCT_INFO_PREVIOUS_NEXT_SORT')) {
+    zen_define_default('PRODUCT_INFO_PREVIOUS_NEXT_SORT', zen_get_configuration_key_value_layout('PRODUCT_INFO_PREVIOUS_NEXT_SORT', $check_type));
+  }
 
   // sort order
     $prev_next_order = zen_products_sort_order();
 
 // set current category
-  $current_category_id = (isset($_GET['current_category_id']) ? (int)$_GET['current_category_id'] : $current_category_id);
+  $current_category_id = (int)($_GET['current_category_id'] ?? $current_category_id);
 
   if (empty($current_category_id)) {
     $sql = "SELECT categories_id
@@ -47,12 +49,11 @@ if (!isset($prev_next_list) || $prev_next_list == '') {
   }
 
   $sql = "SELECT p.products_id, pd.products_name
-          FROM   " . TABLE_PRODUCTS . " p,
-                 " . TABLE_PRODUCTS_DESCRIPTION . " pd,
-                 " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc
-          WHERE  p.products_id = pd.products_id
-          AND pd.language_id= " . (int)$_SESSION['languages_id'] . "
-          AND p.products_id = ptc.products_id
+          FROM       " . TABLE_PRODUCTS . " p
+          INNER JOIN " . TABLE_PRODUCTS_DESCRIPTION . " pd ON (p.products_id = pd.products_id)
+          INNER JOIN " . TABLE_PRODUCTS_TO_CATEGORIES . " ptc ON (p.products_id = ptc.products_id)
+          WHERE
+          pd.language_id= " . (int)$_SESSION['languages_id'] . "
           AND ptc.categories_id = " . (int)$current_category_id .
       $prev_next_order
   ;

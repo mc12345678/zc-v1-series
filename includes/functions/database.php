@@ -35,7 +35,12 @@ function zen_db_input($string)
  */
 function zen_db_output(string $string)
 {
-    trigger_error('Call to deprecated function zen_db_output. Use zen_output_string_protected() ' . (IS_ADMIN_FLAG ? 'for single encoding or consider htmlspecialchars() to support original double encoding ' : '') . 'instead', E_USER_DEPRECATED);
+    static $firstRun;
+    
+    if (!isset($firstRun)) {
+        trigger_error('Call to deprecated function zen_db_output. Use zen_output_string_protected() ' . (IS_ADMIN_FLAG ? 'for single encoding or consider htmlspecialchars() to support original double encoding ' : '') . 'instead', E_USER_DEPRECATED);
+        $firstRun = true;
+    }
 
     if (IS_ADMIN_FLAG) {
       return htmlspecialchars($string, ENT_COMPAT, CHARSET, true);
@@ -61,17 +66,15 @@ function zen_db_prepare_input($string, bool $trimspace = true)
     if (is_string($string)) {
         if ($trimspace == true) {
             return trim(stripslashes($string));
-        } else {
-            return stripslashes($string);
         }
+        return stripslashes($string);
     } elseif (is_array($string)) {
         foreach ($string as $key => $value) {
             $string[$key] = zen_db_prepare_input($value);
         }
         return $string;
-    } else {
-        return $string;
     }
+    return $string;
 }
 
 
@@ -89,6 +92,9 @@ function zen_db_prepare_input($string, bool $trimspace = true)
 function zen_db_perform(string $tableName, array $tableData, $performType = 'INSERT', string $whereCondition = '')
 {
     global $db;
+    
+    $query = '';
+    
     if (strtolower($performType) == 'insert') {
         $query = 'INSERT INTO ' . $tableName . ' (';
         foreach ($tableData as $columns => $value) {
@@ -189,7 +195,12 @@ function zen_db_perform_language(string $tableName, array $tableData, string $ke
  * Return a random row from a database query
  */
 function zen_random_select($query) {
-    trigger_error('Call to deprecated function zen_random_select. Use $db->ExecuteRandomMulti() instead', E_USER_DEPRECATED);
+    static $firstRun;
+    
+    if (!isset($firstRun)) {
+        trigger_error('Call to deprecated function zen_random_select. Use $db->ExecuteRandomMulti() instead', E_USER_DEPRECATED);
+        $firstRun = true;
+    }
 
     global $db;
     $random_query = $db->Execute($query);

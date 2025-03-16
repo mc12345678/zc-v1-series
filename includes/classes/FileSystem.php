@@ -74,7 +74,7 @@ class FileSystem extends IlluminateFilesystem
     public function isAdminDir($filePath)
     {
         if (!defined('DIR_FS_ADMIN')) return false;
-        $test = str_replace(DIR_FS_ADMIN, '', $filePath);
+        $test = str_replace(dirname(DIR_FS_ADMIN), '', $filePath);
         if ($test != $filePath) return true;
         return false;
     }
@@ -94,7 +94,7 @@ class FileSystem extends IlluminateFilesystem
     {
         if ($this->isAdminDir($filePath)) return false;
         if (!defined('DIR_FS_CATALOG')) return false;
-        $test = str_replace(DIR_FS_CATALOG, '', $filePath);
+        $test = str_replace(dirname(DIR_FS_CATALOG), '', $filePath);
         if ($test != $filePath) return true;
         return false;
 

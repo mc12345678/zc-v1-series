@@ -62,12 +62,32 @@ class FileSystem extends IlluminateFilesystem
         return $found;
     }
 
+    public function isAdminRootDir($filePath)
+    {
+        if (!defined('DIR_FS_ADMIN')) return false;
+        $filePath = dirname($filePath);
+        $test = str_replace(dirname(DIR_FS_ADMIN), '', $filePath);
+        if ($test != $filePath && $test === '') return true;
+        return false;
+    }
+
     public function isAdminDir($filePath)
     {
         if (!defined('DIR_FS_ADMIN')) return false;
         $test = str_replace(DIR_FS_ADMIN, '', $filePath);
         if ($test != $filePath) return true;
         return false;
+    }
+
+    public function isCatalogRootDir($filePath)
+    {
+        if ($this->isAdminDir($filePath)) return false;
+        if (!defined('DIR_FS_CATALOG')) return false;
+        $filePath = dirname($filePath);
+        $test = str_replace(dirname(DIR_FS_CATALOG), '', $filePath);
+        if ($test != $filePath && $test === '') return true;
+        return false;
+
     }
 
     public function isCatalogDir($filePath)

@@ -102,8 +102,16 @@ class FileSystem extends IlluminateFilesystem
 
     public function getRelativeDir($filePath)
     {
-        if ($this->isAdminDir($filePath)) return str_replace(DIR_FS_ADMIN, '', $filePath);
-        if ($this->isCatalogDir($filePath)) return str_replace(DIR_FS_CATALOG, '', $filePath);
+        if ($this->isAdminDir($filePath)) {
+          $returnPath = str_replace(dirname(DIR_FS_ADMIN), '', $filePath);
+          $returnPath = substr($returnPath, 1);
+          return $returnPath;
+        }
+        if ($this->isCatalogDir($filePath)) {
+          $returnPath = str_replace(dirname(DIR_FS_CATALOG), '', $filePath);
+          $returnPath = substr($returnPath, 1);
+          return $returnPath;
+        }
         return $filePath;
     }
 

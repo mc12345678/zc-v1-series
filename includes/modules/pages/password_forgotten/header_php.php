@@ -88,7 +88,16 @@ if (isset($_GET['action']) && $_GET['action'] === 'process') {
         // $html_msg = 'none';
 
         // Send the email
-        zen_mail($name, $email_address, EMAIL_PASSWORD_RESET_SUBJECT, $body, STORE_NAME, EMAIL_FROM, $html_msg, 'password_forgotten');
+        zen_mail(
+            $name,
+            $email_address,
+            EMAIL_PASSWORD_RESET_SUBJECT,
+            $body,
+            STORE_NAME,
+            EMAIL_FROM,
+            $html_msg,
+            'password_forgotten'
+        );
 
         // handle 3rd-party integrations
         $zco_notifier->notify('NOTIFY_PASSWORD_RESET_URL_SENT', $email_address, $check_customer->fields['customers_id'], $token);
